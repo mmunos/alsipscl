@@ -1,0 +1,2828 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Florent Capelli*, YooJung Choi, Stefan Mengel*, Martín Muñoz*, Guy Van den Broeck" />
+  <title>A canonical generalization of OBDDs</title>
+  <style type="text/css">
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+    href="monoski.css" />
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+   href="extra.css" />
+  <script src="monosurf.js"
+    charset="utf-8" type="text/javascript"></script>
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">A canonical generalization of OBDDs</h1>
+  <p class="subtitle">TDD — Tree Decision Diagrams</p>
+    
+  <p class="author">
+Florent Capelli*, YooJung Choi, Stefan Mengel*, <em>Martín Muñoz</em>*,
+Guy Van den Broeck<br/>
+  </p>
+  <p class="institute">
+*CRIL, Université d’Artois
+  </p>
+  <p class="event">SAT 2026</p>
+  
+    <p class="date">July, 2026</p>
+    
+</div>
+<section id="knowledge-compilation-in-a-nutshell" class="slide level2">
+<h2>Knowledge Compilation in a nutshell</h2>
+<p>Given a Boolean function
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>:</mo><mo stretchy="false" form="prefix">{</mo><mn>0</mn><mo>,</mo><mn>1</mn><msup><mo stretchy="false" form="postfix">}</mo><mi>X</mi></msup><mo>→</mo><mo stretchy="false" form="prefix">{</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">f : \{0,1\}^X \rightarrow \{0,1\}</annotation></semantics></math>,
+we want to represent it with a <strong>“good”</strong> data
+structure:</p>
+<div class="row">
+<div class="d">
+<ul>
+<li>Succinct.</li>
+<li>Tractable queries:
+<ul>
+<li>(weighted) model counting</li>
+<li>enumeration of models</li>
+<li>sampling…</li>
+</ul></li>
+<li>Tractable transformations:
+<ul>
+<li>negation</li>
+<li>conditioning<br />
+</li>
+<li>conjunction…</li>
+</ul></li>
+</ul>
+</div>
+<div class="d fragment">
+<p>👈 The more of these we have,</p>
+<p>the <strong>“better”</strong> the representation is.</p>
+</div>
+</div>
+</section>
+<section id="obdds" class="slide level2">
+<h2>OBDDs</h2>
+<div class="d">
+<p>Ordered Binary Decision Diagrams (OBDD) represent Boolean functions
+as successive ordered <em>tests</em> on variables
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>x</mi><mi>n</mi></msub></mrow><annotation encoding="application/x-tex">x_1,\dots,x_n</annotation></semantics></math>:</p>
+</div>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mspace width="0.167em"></mspace><annotation encoding="application/x-tex">
+\,
+</annotation></semantics></math></p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mspace width="0.167em"></mspace><annotation encoding="application/x-tex">
+\,
+</annotation></semantics></math></p>
+<div class="row">
+<div class="d">
+<div class="rstack">
+<div class="fragment current-fragment" data-fragment-index="1:hide">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 13.0.0~dev.20250507.0836 (20250507.0836)
+ -->
+<!-- Title: OBDD Pages: 1 -->
+<svg width="429pt" height="135pt"
+ viewBox="0.00 0.00 429.00 135.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 131.49)">
+<title>OBDD</title>
+<polygon fill="none" stroke="none" points="-4,4 -4,-131.49 424.59,-131.49 424.59,4 -4,4"/>
+<!-- v10 -->
+<g id="node1" class="node visible fragment" data-fragment-index="0a:!highlight">
+<title>v10</title>
+<ellipse fill="none" stroke="black" cx="23.32" cy="-59.49" rx="23.32" ry="23.32"/>
+<text xml:space="preserve" text-anchor="middle" x="23.32" y="-54.81" font-family="Times,serif" font-size="14.00">x1</text>
+</g>
+<!-- v20 -->
+<g id="node2" class="node">
+<title>v20</title>
+<ellipse fill="none" stroke="black" cx="114.97" cy="-92.49" rx="23.32" ry="23.32"/>
+<text xml:space="preserve" text-anchor="middle" x="114.97" y="-87.81" font-family="Times,serif" font-size="14.00">x2</text>
+</g>
+<!-- v10&#45;&gt;v20 -->
+<g id="edge1" class="edge">
+<title>v10&#45;&gt;v20</title>
+<path fill="none" stroke="black" d="M45.57,-67.31C56.43,-71.3 69.88,-76.25 81.96,-80.7"/>
+<polygon fill="black" stroke="black" points="80.56,-83.91 91.15,-84.08 82.97,-77.34 80.56,-83.91"/>
+<text xml:space="preserve" text-anchor="middle" x="69.15" y="-80.92" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+<!-- v21 -->
+<g id="node3" class="node visible fragment" data-fragment-index="0a:!highlight">
+<title>v21</title>
+<ellipse fill="none" stroke="black" cx="114.97" cy="-27.49" rx="23.32" ry="23.32"/>
+<text xml:space="preserve" text-anchor="middle" x="114.97" y="-22.81" font-family="Times,serif" font-size="14.00">x2</text>
+</g>
+<!-- v10&#45;&gt;v21 -->
+<g id="edge2" class="edge visible fragment" data-fragment-index="0a:!highlight">
+<title>v10&#45;&gt;v21</title>
+<path fill="none" stroke="black" d="M45.57,-51.9C56.43,-48.02 69.88,-43.23 81.96,-38.91"/>
+<polygon fill="black" stroke="black" points="82.9,-42.29 91.14,-35.63 80.55,-35.7 82.9,-42.29"/>
+<text xml:space="preserve" text-anchor="middle" x="69.15" y="-48.39" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- v30 -->
+<g id="node4" class="node">
+<title>v30</title>
+<ellipse fill="none" stroke="black" cx="206.62" cy="-99.49" rx="23.32" ry="23.32"/>
+<text xml:space="preserve" text-anchor="middle" x="206.62" y="-94.81" font-family="Times,serif" font-size="14.00">x3</text>
+</g>
+<!-- v20&#45;&gt;v30 -->
+<g id="edge3" class="edge">
+<title>v20&#45;&gt;v30</title>
+<path fill="none" stroke="black" d="M138.1,-96.3C143.99,-97.17 150.37,-97.99 156.3,-98.49 161.33,-98.91 166.66,-99.19 171.89,-99.37"/>
+<polygon fill="black" stroke="black" points="171.41,-102.86 181.49,-99.6 171.57,-95.86 171.41,-102.86"/>
+<text xml:space="preserve" text-anchor="middle" x="160.8" y="-102.99" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+<!-- v31 -->
+<g id="node5" class="node visible fragment" data-fragment-index="0a:!highlight">
+<title>v31</title>
+<ellipse fill="none" stroke="black" cx="206.62" cy="-27.49" rx="23.32" ry="23.32"/>
+<text xml:space="preserve" text-anchor="middle" x="206.62" y="-22.81" font-family="Times,serif" font-size="14.00">x3</text>
+</g>
+<!-- v20&#45;&gt;v31 -->
+<g id="edge4" class="edge">
+<title>v20&#45;&gt;v31</title>
+<path fill="none" stroke="black" d="M134.87,-79.8C144.12,-73.5 155.38,-65.71 165.3,-58.49 169.7,-55.27 174.33,-51.81 178.82,-48.4"/>
+<polygon fill="black" stroke="black" points="180.7,-51.36 186.51,-42.5 176.44,-45.81 180.7,-51.36"/>
+<text xml:space="preserve" text-anchor="middle" x="160.8" y="-68.16" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- v21&#45;&gt;v30 -->
+<g id="edge6" class="edge">
+<title>v21&#45;&gt;v30</title>
+<path fill="none" stroke="black" d="M138.54,-28.19C147.49,-29.38 157.49,-31.95 165.3,-37.24 171.73,-41.59 181.06,-55.68 189.13,-69.35"/>
+<polygon fill="black" stroke="black" points="185.95,-70.85 193.96,-77.78 192.02,-67.36 185.95,-70.85"/>
+<text xml:space="preserve" text-anchor="middle" x="160.8" y="-41.19" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- v21&#45;&gt;v31 -->
+<g id="edge5" class="edge visible fragment" data-fragment-index="0a:!highlight">
+<title>v21&#45;&gt;v31</title>
+<path fill="none" stroke="black" d="M133.33,-13.05C140.07,-8.32 148.13,-3.66 156.3,-1.24 164.35,1.16 172.6,-1.08 180,-5.08"/>
+<polygon fill="black" stroke="black" points="177.92,-7.9 188.19,-10.52 181.8,-2.07 177.92,-7.9"/>
+<text xml:space="preserve" text-anchor="middle" x="160.8" y="-5.19" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+<!-- v40 -->
+<g id="node6" class="node visible fragment" data-fragment-index="0a:!highlight">
+<title>v40</title>
+<ellipse fill="none" stroke="black" cx="298.27" cy="-102.49" rx="23.32" ry="23.32"/>
+<text xml:space="preserve" text-anchor="middle" x="298.27" y="-97.81" font-family="Times,serif" font-size="14.00">x4</text>
+</g>
+<!-- v30&#45;&gt;v40 -->
+<g id="edge7" class="edge">
+<title>v30&#45;&gt;v40</title>
+<path fill="none" stroke="black" d="M230.22,-100.72C236,-101.01 242.2,-101.28 247.95,-101.49 252.99,-101.66 258.33,-101.81 263.56,-101.93"/>
+<polygon fill="black" stroke="black" points="263.09,-105.42 273.16,-102.13 263.24,-98.43 263.09,-105.42"/>
+<text xml:space="preserve" text-anchor="middle" x="252.45" y="-105.69" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+<!-- v41 -->
+<g id="node7" class="node">
+<title>v41</title>
+<ellipse fill="none" stroke="black" cx="298.27" cy="-30.49" rx="23.32" ry="23.32"/>
+<text xml:space="preserve" text-anchor="middle" x="298.27" y="-25.81" font-family="Times,serif" font-size="14.00">x4</text>
+</g>
+<!-- v30&#45;&gt;v41 -->
+<g id="edge8" class="edge">
+<title>v30&#45;&gt;v41</title>
+<path fill="none" stroke="black" d="M225.76,-85.52C238.52,-75.7 255.82,-62.39 270.2,-51.32"/>
+<polygon fill="black" stroke="black" points="272.17,-54.22 277.96,-45.35 267.9,-48.68 272.17,-54.22"/>
+<text xml:space="preserve" text-anchor="middle" x="252.45" y="-71" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- v31&#45;&gt;v40 -->
+<g id="edge10" class="edge visible fragment" data-fragment-index="0a:!highlight">
+<title>v31&#45;&gt;v40</title>
+<path fill="none" stroke="black" d="M230.24,-30.29C239.2,-32.25 249.19,-35.58 256.95,-41.24 263.05,-45.69 272.17,-59.19 280.19,-72.38"/>
+<polygon fill="black" stroke="black" points="277.16,-74.14 285.27,-80.96 283.18,-70.57 277.16,-74.14"/>
+<text xml:space="preserve" text-anchor="middle" x="252.45" y="-45.19" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- v31&#45;&gt;v41 -->
+<g id="edge9" class="edge">
+<title>v31&#45;&gt;v41</title>
+<path fill="none" stroke="black" d="M224.92,-12.34C234.15,-6.08 245.87,-0.95 256.95,-4.24 261.54,-5.6 266.1,-7.67 270.41,-10.06"/>
+<polygon fill="black" stroke="black" points="268.31,-12.87 278.64,-15.24 272.04,-6.95 268.31,-12.87"/>
+<text xml:space="preserve" text-anchor="middle" x="252.45" y="-8.19" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+<!-- accept -->
+<g id="node8" class="node visible fragment" data-fragment-index="0a:!highlight">
+<title>accept</title>
+<polygon fill="none" stroke="black" points="420.59,-127.49 366.59,-127.49 366.59,-91.49 420.59,-91.49 420.59,-127.49"/>
+<text xml:space="preserve" text-anchor="middle" x="393.59" y="-104.81" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- v40&#45;&gt;accept -->
+<g id="edge11" class="edge visible fragment" data-fragment-index="0a:!highlight">
+<title>v40&#45;&gt;accept</title>
+<path fill="none" stroke="black" d="M321.86,-104.18C331.79,-104.92 343.72,-105.82 354.93,-106.66"/>
+<polygon fill="black" stroke="black" points="354.5,-110.14 364.73,-107.4 355.02,-103.16 354.5,-110.14"/>
+<text xml:space="preserve" text-anchor="middle" x="344.09" y="-109.94" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+<!-- reject -->
+<g id="node9" class="node">
+<title>reject</title>
+<polygon fill="none" stroke="black" points="420.59,-57.49 366.59,-57.49 366.59,-21.49 420.59,-21.49 420.59,-57.49"/>
+<text xml:space="preserve" text-anchor="middle" x="393.59" y="-34.81" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+<!-- v40&#45;&gt;reject -->
+<g id="edge12" class="edge">
+<title>v40&#45;&gt;reject</title>
+<path fill="none" stroke="black" d="M318.15,-89.74C329.3,-82.21 343.76,-72.45 356.98,-63.53"/>
+<polygon fill="black" stroke="black" points="358.73,-66.57 365.06,-58.07 354.81,-60.77 358.73,-66.57"/>
+<text xml:space="preserve" text-anchor="middle" x="344.09" y="-78.71" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- v41&#45;&gt;accept -->
+<g id="edge14" class="edge">
+<title>v41&#45;&gt;accept</title>
+<path fill="none" stroke="black" d="M321.26,-36.39C330.32,-39.53 340.56,-44.04 348.59,-50.24 359.55,-58.68 369.09,-70.53 376.46,-81.43"/>
+<polygon fill="black" stroke="black" points="373.45,-83.21 381.78,-89.76 379.35,-79.45 373.45,-83.21"/>
+<text xml:space="preserve" text-anchor="middle" x="344.09" y="-54.19" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- v41&#45;&gt;reject -->
+<g id="edge13" class="edge">
+<title>v41&#45;&gt;reject</title>
+<path fill="none" stroke="black" d="M316.19,-15.4C325.52,-8.92 337.44,-3.58 348.59,-7.24 353.83,-8.95 358.96,-11.55 363.76,-14.55"/>
+<polygon fill="black" stroke="black" points="361.65,-17.34 371.84,-20.22 365.67,-11.61 361.65,-17.34"/>
+<text xml:space="preserve" text-anchor="middle" x="344.09" y="-11.19" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+</g>
+</svg>
+
+</div>
+<div class="fragment" data-fragment-index="1:visible">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 13.0.0~dev.20250507.0836 (20250507.0836)
+ -->
+<!-- Title: OBDD Pages: 1 -->
+<svg width="391pt" height="144pt"
+ viewBox="0.00 0.00 391.00 144.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 139.85)">
+<title>OBDD</title>
+<polygon fill="none" stroke="none" points="-4,4 -4,-139.85 387.39,-139.85 387.39,4 -4,4"/>
+<!-- v10 -->
+<g id="node1" class="node">
+<title>v10</title>
+<ellipse fill="none" stroke="black" cx="18" cy="-59.85" rx="18" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="18" y="-55.17" font-family="Times,serif" font-size="14.00">8</text>
+</g>
+<!-- v20 -->
+<g id="node2" class="node">
+<title>v20</title>
+<ellipse fill="none" stroke="black" cx="101.69" cy="-88.85" rx="20.69" ry="20.69"/>
+<text xml:space="preserve" text-anchor="middle" x="101.69" y="-84.17" font-family="Times,serif" font-size="14.00">4 </text>
+</g>
+<!-- v10&#45;&gt;v20 -->
+<g id="edge1" class="edge">
+<title>v10&#45;&gt;v20</title>
+<path fill="none" stroke="black" d="M35.53,-65.72C45.81,-69.37 59.32,-74.16 71.38,-78.44"/>
+<polygon fill="black" stroke="black" points="69.88,-81.63 80.47,-81.67 72.22,-75.03 69.88,-81.63"/>
+<text xml:space="preserve" text-anchor="middle" x="58.5" y="-79.17" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+<!-- v21 -->
+<g id="node3" class="node">
+<title>v21</title>
+<ellipse fill="none" stroke="black" cx="101.69" cy="-31.85" rx="18" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="101.69" y="-27.17" font-family="Times,serif" font-size="14.00">4</text>
+</g>
+<!-- v10&#45;&gt;v21 -->
+<g id="edge2" class="edge">
+<title>v10&#45;&gt;v21</title>
+<path fill="none" stroke="black" d="M34.84,-52.37C40.77,-49.72 47.62,-46.85 54,-44.6 60.04,-42.47 66.63,-40.48 72.9,-38.73"/>
+<polygon fill="black" stroke="black" points="73.43,-42.21 82.19,-36.26 71.63,-35.45 73.43,-42.21"/>
+<text xml:space="preserve" text-anchor="middle" x="58.5" y="-48.55" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- v30 -->
+<g id="node4" class="node">
+<title>v30</title>
+<ellipse fill="none" stroke="black" cx="185.39" cy="-100.85" rx="18" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="185.39" y="-96.17" font-family="Times,serif" font-size="14.00">2</text>
+</g>
+<!-- v20&#45;&gt;v30 -->
+<g id="edge3" class="edge">
+<title>v20&#45;&gt;v30</title>
+<path fill="none" stroke="black" d="M121.7,-94.74C127.63,-96.35 134.23,-97.9 140.39,-98.85 145.32,-99.61 150.6,-100.11 155.72,-100.43"/>
+<polygon fill="black" stroke="black" points="155.52,-103.93 165.66,-100.85 155.81,-96.94 155.52,-103.93"/>
+<text xml:space="preserve" text-anchor="middle" x="144.89" y="-103.83" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+<!-- v31 -->
+<g id="node5" class="node">
+<title>v31</title>
+<ellipse fill="none" stroke="black" cx="185.39" cy="-33.85" rx="18" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="185.39" y="-29.17" font-family="Times,serif" font-size="14.00">2</text>
+</g>
+<!-- v20&#45;&gt;v31 -->
+<g id="edge4" class="edge">
+<title>v20&#45;&gt;v31</title>
+<path fill="none" stroke="black" d="M119.68,-78.22C128.6,-72.57 139.66,-65.45 149.39,-58.85 153.17,-56.28 157.15,-53.51 161.01,-50.79"/>
+<polygon fill="black" stroke="black" points="162.86,-53.77 168.96,-45.11 158.79,-48.07 162.86,-53.77"/>
+<text xml:space="preserve" text-anchor="middle" x="144.89" y="-68.7" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- v21&#45;&gt;v30 -->
+<g id="edge6" class="edge">
+<title>v21&#45;&gt;v30</title>
+<path fill="none" stroke="black" d="M119.99,-30.34C129.41,-30.36 140.86,-31.84 149.39,-37.6 156.32,-42.28 165.52,-59.22 172.74,-74.4"/>
+<polygon fill="black" stroke="black" points="169.38,-75.46 176.75,-83.07 175.73,-72.53 169.38,-75.46"/>
+<text xml:space="preserve" text-anchor="middle" x="144.89" y="-41.55" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- v21&#45;&gt;v31 -->
+<g id="edge5" class="edge">
+<title>v21&#45;&gt;v31</title>
+<path fill="none" stroke="black" d="M113.14,-17.88C122.18,-7.62 135.89,3.67 149.39,-1.6 155.35,-3.93 160.91,-7.8 165.77,-12.07"/>
+<polygon fill="black" stroke="black" points="163.05,-14.3 172.61,-18.87 167.98,-9.34 163.05,-14.3"/>
+<text xml:space="preserve" text-anchor="middle" x="144.89" y="-5.55" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+<!-- v40 -->
+<g id="node6" class="node">
+<title>v40</title>
+<ellipse fill="none" stroke="black" cx="266.39" cy="-107.85" rx="18" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="266.39" y="-103.17" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- v30&#45;&gt;v40 -->
+<g id="edge7" class="edge">
+<title>v30&#45;&gt;v40</title>
+<path fill="none" stroke="black" d="M203.44,-103.62C209.13,-104.46 215.52,-105.3 221.39,-105.85 226.35,-106.32 231.65,-106.68 236.78,-106.95"/>
+<polygon fill="black" stroke="black" points="236.57,-110.44 246.71,-107.39 236.88,-103.45 236.57,-110.44"/>
+<text xml:space="preserve" text-anchor="middle" x="225.89" y="-110.48" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+<!-- v41 -->
+<g id="node7" class="node">
+<title>v41</title>
+<ellipse fill="none" stroke="black" cx="266.39" cy="-40.85" rx="18" ry="18"/>
+<text xml:space="preserve" text-anchor="middle" x="266.39" y="-36.17" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- v30&#45;&gt;v41 -->
+<g id="edge8" class="edge">
+<title>v30&#45;&gt;v41</title>
+<path fill="none" stroke="black" d="M200.15,-90.4C211.86,-81.51 228.91,-68.55 242.65,-58.12"/>
+<polygon fill="black" stroke="black" points="244.47,-61.13 250.31,-52.3 240.23,-55.56 244.47,-61.13"/>
+<text xml:space="preserve" text-anchor="middle" x="225.89" y="-76.6" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- v31&#45;&gt;v40 -->
+<g id="edge10" class="edge">
+<title>v31&#45;&gt;v40</title>
+<path fill="none" stroke="black" d="M203.66,-36.2C212.41,-38.1 222.76,-41.51 230.39,-47.6 241.17,-56.21 249.3,-69.11 254.99,-80.77"/>
+<polygon fill="black" stroke="black" points="251.65,-81.88 258.92,-89.58 258.04,-79.02 251.65,-81.88"/>
+<text xml:space="preserve" text-anchor="middle" x="225.89" y="-51.55" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- v31&#45;&gt;v41 -->
+<g id="edge9" class="edge">
+<title>v31&#45;&gt;v41</title>
+<path fill="none" stroke="black" d="M197.86,-20.58C206.47,-12.32 218.74,-4.05 230.39,-8.6 236.35,-10.93 241.91,-14.8 246.77,-19.07"/>
+<polygon fill="black" stroke="black" points="244.05,-21.3 253.61,-25.87 248.98,-16.34 244.05,-21.3"/>
+<text xml:space="preserve" text-anchor="middle" x="225.89" y="-12.55" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+<!-- accept -->
+<g id="node8" class="node">
+<title>accept</title>
+<polygon fill="none" stroke="black" points="383.39,-135.85 329.39,-135.85 329.39,-99.85 383.39,-99.85 383.39,-135.85"/>
+<text xml:space="preserve" text-anchor="middle" x="356.39" y="-113.17" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- v40&#45;&gt;accept -->
+<g id="edge11" class="edge">
+<title>v40&#45;&gt;accept</title>
+<path fill="none" stroke="black" d="M284.46,-110.46C290.15,-111.28 296.54,-112.16 302.39,-112.85 307.37,-113.44 312.63,-114.01 317.82,-114.53"/>
+<polygon fill="black" stroke="black" points="317.14,-117.98 327.43,-115.46 317.82,-111.01 317.14,-117.98"/>
+<text xml:space="preserve" text-anchor="middle" x="306.89" y="-117.77" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+<!-- reject -->
+<g id="node9" class="node">
+<title>reject</title>
+<polygon fill="none" stroke="black" points="383.39,-65.85 329.39,-65.85 329.39,-29.85 383.39,-29.85 383.39,-65.85"/>
+<text xml:space="preserve" text-anchor="middle" x="356.39" y="-43.17" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+<!-- v40&#45;&gt;reject -->
+<g id="edge12" class="edge">
+<title>v40&#45;&gt;reject</title>
+<path fill="none" stroke="black" d="M281.92,-97.94C292.21,-90.92 306.48,-81.19 319.71,-72.17"/>
+<polygon fill="black" stroke="black" points="321.55,-75.16 327.84,-66.63 317.61,-69.37 321.55,-75.16"/>
+<text xml:space="preserve" text-anchor="middle" x="306.89" y="-87.17" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- v41&#45;&gt;accept -->
+<g id="edge14" class="edge">
+<title>v41&#45;&gt;accept</title>
+<path fill="none" stroke="black" d="M284.44,-44.38C293.12,-46.79 303.48,-50.64 311.39,-56.6 317.97,-61.56 328.73,-76.46 337.95,-90.33"/>
+<polygon fill="black" stroke="black" points="334.8,-91.9 343.2,-98.36 340.66,-88.07 334.8,-91.9"/>
+<text xml:space="preserve" text-anchor="middle" x="306.89" y="-60.55" font-family="Times,serif" font-size="14.00">1</text>
+</g>
+<!-- v41&#45;&gt;reject -->
+<g id="edge13" class="edge">
+<title>v41&#45;&gt;reject</title>
+<path fill="none" stroke="black" d="M279.08,-27.63C287.61,-19.68 299.67,-11.77 311.39,-15.6 316.62,-17.31 321.75,-19.91 326.56,-22.91"/>
+<polygon fill="black" stroke="black" points="324.44,-25.7 334.64,-28.59 328.47,-19.98 324.44,-25.7"/>
+<text xml:space="preserve" text-anchor="middle" x="306.89" y="-19.55" font-family="Times,serif" font-size="14.00">0</text>
+</g>
+</g>
+</svg>
+
+</div>
+</div>
+<p>A succinct representation of the Boolean function
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>V</mi><mi>E</mi><mi>N</mi><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><mi>…</mi><mo>,</mo><msub><mi>x</mi><mn>4</mn></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">EVEN(x_1,\dots,x_4)</annotation></semantics></math>.</p>
+</div>
+<div class="d">
+<ul>
+<li>Linear time algorithm to find a model, count models…</li>
+</ul>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mspace width="0.167em"></mspace><annotation encoding="application/x-tex">
+\,
+</annotation></semantics></math></p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mspace width="0.167em"></mspace><annotation encoding="application/x-tex">
+\,
+</annotation></semantics></math></p>
+<ul>
+<li>Good properties: polynomial time minimization, canonicity, tractable
+conjoin, negation etc.</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="beyond-the-o-in-obdds" class="slide level2">
+<h2>Beyond the O in OBDDs</h2>
+<p>The following syntactically restricted Boolean (AND, OR, NOT)
+circuits are more general than OBDDs but at a cost:</p>
+<div class="fragment">
+<ul>
+<li>DNNF circuits
+<ul>
+<li>D = decomposable: AND gates have disjoint variables at each
+side.</li>
+<li>NNF = negation normal form: NOT’s appear only at the bottom.</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Deterministic DNNF circuits
+<ul>
+<li>determinstic: OR gates receive disjoint models at each side.</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Structured Deterministic DNNF circuits
+<ul>
+<li>Structured: the circuit has an underlying <em>tree structure</em>
+(vtree).</li>
+</ul></li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>SDD (Sentential Decision Diagrams)
+<ul>
+<li>Like OBDD, but instead of testing just one variable, nodes test more
+than one variable.</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="beyond-the-o-in-obdds-1" class="slide level2">
+<h2>Beyond the O in OBDDs</h2>
+<p>The following syntactically restricted Boolean circuits are more
+general than OBDDs but at a cost:</p>
+<table>
+<tr>
+<th>
+Name
+</th>
+<th>
+Counting
+</th>
+<th>
+Negation
+</th>
+<th>
+Conjunction
+</th>
+<th>
+Conditioning
+</th>
+<th>
+Canonicity
+</th>
+</tr>
+<tr>
+<td>
+DNNF
+</td>
+<td style="color:orange; font-size: 1.5em">
+☑ (FPRAS)
+</td>
+<td>
+❌
+</td>
+<td>
+❌
+</td>
+<td>
+✅
+</td>
+<td>
+❌
+</td>
+</tr>
+<tr>
+<td>
+Deterministic DNNF
+</td>
+<td>
+✅
+</td>
+<td>
+❓
+</td>
+<td>
+❌
+</td>
+<td>
+✅
+</td>
+<td>
+❌
+</td>
+</tr>
+<tr>
+<td>
+Structured Deterministic DNNF
+</td>
+<td>
+✅
+</td>
+<td>
+❌
+</td>
+<td>
+✅
+</td>
+<td>
+✅
+</td>
+<td>
+❌
+</td>
+</tr>
+<tr>
+<td>
+SDD (Sentential Decision Diagrams)
+</td>
+<td>
+✅
+</td>
+<td>
+✅
+</td>
+<td>
+✅
+</td>
+<td style="color:blue; font-size: 1.5em">
+☑
+</td>
+<td style="color:blue; font-size: 1.5em">
+☑
+</td>
+</tr>
+<tr style="background: orange" class="fragment">
+<td>
+❔❔❔
+</td>
+<td>
+✅
+</td>
+<td>
+✅
+</td>
+<td>
+✅
+</td>
+<td>
+✅
+</td>
+<td>
+✅
+</td>
+</tr>
+</table>
+</section>
+<section id="tree-decision-diagrams-tdd" class="slide level2">
+<h2>Tree Decision Diagrams (TDD)</h2>
+<table>
+<tr>
+<th>
+Name
+</th>
+<th>
+Counting
+</th>
+<th>
+Negation
+</th>
+<th>
+Conjunction
+</th>
+<th>
+Conditioning
+</th>
+<th>
+Canonicity
+</th>
+</tr>
+<tr>
+<td>
+TDD
+</td>
+<td>
+✅
+</td>
+<td>
+✅
+</td>
+<td>
+✅
+</td>
+<td>
+✅
+</td>
+<td>
+✅
+</td>
+</tr>
+</table>
+<p>Tree Decision Diagrams is a <em>new data structure</em> for
+representing Boolean functions:</p>
+<ul>
+<li>Special form of <strong>structured d-DNNF</strong> (variables follow
+a vtree),</li>
+<li>Tractable <strong>NEGATION</strong>, <strong>CONJUNCTION</strong>,
+<strong>CONDITIONING</strong>.</li>
+<li><strong>CANONICAL</strong> form:
+<ul>
+<li>Minimal</li>
+<li>Can be computed from any TDD.</li>
+<li>Natural theoretical description.</li>
+</ul></li>
+</ul>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">OBDD</mtext><mspace width="0.222em"></mspace><mo>&lt;</mo><mspace width="0.222em"></mspace><mtext mathvariant="normal">TDD</mtext><mspace width="0.222em"></mspace><mo>&lt;</mo><mspace width="0.222em"></mspace><mtext mathvariant="normal">SDD</mtext></mrow><annotation encoding="application/x-tex">\text{OBDD} \ &lt;\  \text{TDD} \ &lt;\ \text{SDD}</annotation></semantics></math></p>
+<div class="box important">
+<p>TDDs improves the tractability of OBDDs without sacrificing much.</p>
+</div>
+</section>
+<section id="definition-by-example" class="slide level2">
+<h2>Definition by example</h2>
+<div class="row">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 13.0.0~dev.20250507.0836 (20250507.0836)
+ -->
+<!-- Title: g Pages: 1 -->
+<svg width="1211pt" height="548pt"
+ viewBox="0.00 0.00 1211.00 548.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 544.05)">
+<title>g</title>
+<polygon fill="none" stroke="none" points="-4,4 -4,-544.05 1207,-544.05 1207,4 -4,4"/>
+<g id="clust1" class="cluster">
+<title>cluster_x1</title>
+<polygon fill="#cccccc" stroke="none" points="8,-8 8,-105.05 262,-105.05 262,-8 8,-8"/>
+<text xml:space="preserve" text-anchor="middle" x="135" y="-17.35" font-family="Times,serif" font-size="22.00">x₁</text>
+</g>
+<g id="clust2" class="cluster">
+<title>cluster_x2</title>
+<polygon fill="#cccccc" stroke="none" points="319,-8 319,-105.05 573,-105.05 573,-8 319,-8"/>
+<text xml:space="preserve" text-anchor="middle" x="446" y="-17.35" font-family="Times,serif" font-size="22.00">x₂</text>
+</g>
+<g id="clust3" class="cluster">
+<title>cluster_x3</title>
+<polygon fill="#cccccc" stroke="none" points="630,-8 630,-105.05 884,-105.05 884,-8 630,-8"/>
+<text xml:space="preserve" text-anchor="middle" x="757" y="-17.35" font-family="Times,serif" font-size="22.00">x₃</text>
+</g>
+<g id="clust4" class="cluster">
+<title>cluster_x4</title>
+<polygon fill="#cccccc" stroke="none" points="941,-8 941,-105.05 1195,-105.05 1195,-8 941,-8"/>
+<text xml:space="preserve" text-anchor="middle" x="1068" y="-17.35" font-family="Times,serif" font-size="22.00">x₄</text>
+</g>
+<g id="clust5" class="cluster">
+<title>cluster_t1</title>
+<polygon fill="#cccccc" stroke="none" points="256,-198.8 256,-318.55 556,-318.55 556,-198.8 256,-198.8"/>
+<text xml:space="preserve" text-anchor="middle" x="406" y="-208.15" font-family="Times,serif" font-size="22.00">t₁</text>
+</g>
+<g id="clust6" class="cluster">
+<title>cluster_t2</title>
+<polygon fill="#cccccc" stroke="none" points="612,-198.8 612,-318.55 912,-318.55 912,-198.8 612,-198.8"/>
+<text xml:space="preserve" text-anchor="middle" x="762" y="-208.15" font-family="Times,serif" font-size="22.00">t₂</text>
+</g>
+<g id="clust7" class="cluster">
+<title>cluster_t3</title>
+<polygon fill="#cccccc" stroke="none" points="471,-412.3 471,-532.05 663,-532.05 663,-412.3 471,-412.3"/>
+<text xml:space="preserve" text-anchor="middle" x="567" y="-421.65" font-family="Times,serif" font-size="22.00">t₃</text>
+</g>
+<!-- x1 -->
+<g id="node1" class="node fragment" data-fragment-index="1input">
+<title>x1</title>
+<ellipse fill="lightgrey" stroke="black" cx="158" cy="-73.65" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="158" y="-65.88" font-family="Times,serif" font-size="22.00"> x₁</text>
+</g>
+<!-- Cx1 -->
+<!-- nx1 -->
+<g id="node3" class="node fragment" data-fragment-index="1input &#160;&#160;&#160;5:highlight 5a:highlight">
+<title>nx1</title>
+<ellipse fill="lightgrey" stroke="black" cx="39" cy="-73.65" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="39" y="-65.88" font-family="Times,serif" font-size="22.00"> ¬x₁</text>
+</g>
+<!-- x2 -->
+<g id="node4" class="node fragment" data-fragment-index="1input">
+<title>x2</title>
+<ellipse fill="lightgrey" stroke="black" cx="469" cy="-73.65" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="469" y="-65.88" font-family="Times,serif" font-size="22.00"> x₂</text>
+</g>
+<!-- Cx2 -->
+<!-- nx2 -->
+<g id="node6" class="node fragment" data-fragment-index="1input 5:highlight 5a:highlight">
+<title>nx2</title>
+<ellipse fill="lightgrey" stroke="black" cx="350" cy="-73.65" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="350" y="-65.88" font-family="Times,serif" font-size="22.00">¬x₂</text>
+</g>
+<!-- x3 -->
+<g id="node7" class="node fragment" data-fragment-index="1input 5:highlight">
+<title>x3</title>
+<ellipse fill="lightgrey" stroke="black" cx="780" cy="-73.65" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="780" y="-65.88" font-family="Times,serif" font-size="22.00"> x₃</text>
+</g>
+<!-- Cx3 -->
+<!-- nx3 -->
+<g id="node9" class="node fragment" data-fragment-index="1input 5a:highlight">
+<title>nx3</title>
+<ellipse fill="lightgrey" stroke="black" cx="661" cy="-73.65" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="661" y="-65.88" font-family="Times,serif" font-size="22.00"> ¬x₃</text>
+</g>
+<!-- x4 -->
+<g id="node10" class="node fragment" data-fragment-index="1input">
+<title>x4</title>
+<ellipse fill="lightgrey" stroke="black" cx="1091" cy="-73.65" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="1091" y="-65.88" font-family="Times,serif" font-size="22.00">x₄</text>
+</g>
+<!-- Cx4 -->
+<!-- nx4 -->
+<g id="node12" class="node fragment" data-fragment-index="1input 5:highlight 5a:highlight">
+<title>nx4</title>
+<ellipse fill="lightgrey" stroke="black" cx="972" cy="-73.65" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="972" y="-65.88" font-family="Times,serif" font-size="22.00"> ¬x₄</text>
+</g>
+<!-- Nt1_0 -->
+<g id="node13" class="node fragment" data-fragment-index="2node 5:highlight 5a:highlight">
+<title>Nt1_0</title>
+<polygon fill="lightgrey" stroke="black" points="264.25,-241.55 264.25,-310.05 333.75,-310.05 333.75,-241.55 264.25,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="299" y="-285.15" font-family="Times,serif" font-size="22.00">∪</text>
+<polyline fill="none" stroke="black" points="264.25,-275.8 333.75,-275.8"/>
+<text xml:space="preserve" text-anchor="middle" x="281.62" y="-250.9" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="299,-241.55 299,-275.8"/>
+<text xml:space="preserve" text-anchor="middle" x="316.38" y="-250.9" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- Nt1_0&#45;&gt;x1 -->
+<g id="edge9" class="edge fragment" data-fragment-index="2node">
+<title>Nt1_0:v1&#45;&gt;x1</title>
+<path fill="none" stroke="black" d="M316.38,-240.55C316.38,-167.59 235.24,-114.08 189.12,-89.56"/>
+<polygon fill="black" stroke="black" points="190.87,-86.52 180.38,-85.05 187.66,-92.75 190.87,-86.52"/>
+</g>
+<!-- Nt1_0&#45;&gt;nx1 -->
+<g id="edge7" class="edge fragment" data-fragment-index="2node 5:highlight 5a:highlight">
+<title>Nt1_0:v0&#45;&gt;nx1</title>
+<path fill="none" stroke="black" d="M263.25,-258.68C166.93,-258.68 89.37,-155.97 56.3,-104.01"/>
+<polygon fill="black" stroke="black" points="59.33,-102.27 51.08,-95.63 53.39,-105.97 59.33,-102.27"/>
+</g>
+<!-- Nt1_0&#45;&gt;x2 -->
+<g id="edge10" class="edge fragment" data-fragment-index="2node">
+<title>Nt1_0:v1&#45;&gt;x2</title>
+<path fill="none" stroke="black" d="M316.38,-240.55C316.38,-169.35 393.45,-115.57 438.05,-90.4"/>
+<polygon fill="black" stroke="black" points="439.68,-93.5 446.77,-85.63 436.32,-87.36 439.68,-93.5"/>
+</g>
+<!-- Nt1_0&#45;&gt;nx2 -->
+<g id="edge8" class="edge fragment" data-fragment-index="2node 5:highlight 5a:highlight">
+<title>Nt1_0:v0&#45;&gt;nx2</title>
+<path fill="none" stroke="black" d="M281.62,-240.55C281.62,-188.83 310.39,-134.41 330.6,-102.55"/>
+<polygon fill="black" stroke="black" points="333.45,-104.59 335.99,-94.3 327.59,-100.76 333.45,-104.59"/>
+</g>
+<!-- Ct1 -->
+<!-- Ct1&#45;&gt;Cx1 -->
+<g id="edge1" class="edge">
+<title>Ct1&#45;&gt;Cx1</title>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M512,-198.8C438.56,-127.12 391.25,-153.9 301,-105.05 286.77,-97.35 271.17,-86.8 262,-80.37"/>
+</g>
+<!-- Ct1&#45;&gt;Cx2 -->
+<g id="edge2" class="edge">
+<title>Ct1&#45;&gt;Cx2</title>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M554.46,-198.8C557.23,-166.17 560.31,-129.91 562.42,-105.05"/>
+</g>
+<!-- Nt1_1 -->
+<g id="node15" class="node fragment" data-fragment-index="3node">
+<title>Nt1_1</title>
+<polygon fill="lightgrey" stroke="black" points="406.25,-241.55 406.25,-310.05 475.75,-310.05 475.75,-241.55 406.25,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="441" y="-285.15" font-family="Times,serif" font-size="22.00">∪</text>
+<polyline fill="none" stroke="black" points="406.25,-275.8 475.75,-275.8"/>
+<text xml:space="preserve" text-anchor="middle" x="423.62" y="-250.9" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="441,-241.55 441,-275.8"/>
+<text xml:space="preserve" text-anchor="middle" x="458.38" y="-250.9" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- Nt1_1&#45;&gt;x1 -->
+<g id="edge11" class="edge fragment" data-fragment-index="3node">
+<title>Nt1_1:v0&#45;&gt;x1</title>
+<path fill="none" stroke="black" d="M405.25,-258.68C374.37,-258.68 391.86,-220.61 370,-198.8 341.6,-170.46 240.46,-116.73 188.82,-90.23"/>
+<polygon fill="black" stroke="black" points="190.44,-87.13 179.95,-85.7 187.26,-93.36 190.44,-87.13"/>
+</g>
+<!-- Nt1_1&#45;&gt;nx1 -->
+<g id="edge13" class="edge fragment" data-fragment-index="3node">
+<title>Nt1_1:v1&#45;&gt;nx1</title>
+<path fill="none" stroke="black" d="M458.38,-240.55C458.38,-197.11 410.22,-215.2 370,-198.8 251.99,-150.68 216.34,-154.8 99,-105.05 89.24,-100.91 78.85,-95.88 69.51,-91.12"/>
+<polygon fill="black" stroke="black" points="71.33,-88.12 60.84,-86.61 68.1,-94.33 71.33,-88.12"/>
+</g>
+<!-- Nt1_1&#45;&gt;x2 -->
+<g id="edge14" class="edge fragment" data-fragment-index="3node">
+<title>Nt1_1:v1&#45;&gt;x2</title>
+<path fill="none" stroke="black" d="M458.38,-240.55C458.38,-194.92 462.43,-142.39 465.53,-108.87"/>
+<polygon fill="black" stroke="black" points="469.01,-109.22 466.47,-98.94 462.04,-108.56 469.01,-109.22"/>
+</g>
+<!-- Nt1_1&#45;&gt;nx2 -->
+<g id="edge12" class="edge fragment" data-fragment-index="3node">
+<title>Nt1_1:v0&#45;&gt;nx2</title>
+<path fill="none" stroke="black" d="M423.62,-240.55C423.62,-187.72 392.05,-132.93 370.25,-101.41"/>
+<polygon fill="black" stroke="black" points="373.37,-99.76 364.73,-93.64 367.67,-103.81 373.37,-99.76"/>
+</g>
+<!-- Nt2_0 -->
+<g id="node16" class="node fragment" data-fragment-index="4node 5a:highlight">
+<title>Nt2_0</title>
+<polygon fill="lightgrey" stroke="black" points="762.25,-241.55 762.25,-310.05 831.75,-310.05 831.75,-241.55 762.25,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="797" y="-285.15" font-family="Times,serif" font-size="22.00">∪</text>
+<polyline fill="none" stroke="black" points="762.25,-275.8 831.75,-275.8"/>
+<text xml:space="preserve" text-anchor="middle" x="779.62" y="-250.9" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="797,-241.55 797,-275.8"/>
+<text xml:space="preserve" text-anchor="middle" x="814.38" y="-250.9" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- Nt2_0&#45;&gt;x3 -->
+<g id="edge17" class="edge fragment" data-fragment-index="4node">
+<title>Nt2_0:v1&#45;&gt;x3</title>
+<path fill="none" stroke="black" d="M814.38,-240.55C814.38,-193.32 800.85,-140.07 790.77,-106.93"/>
+<polygon fill="black" stroke="black" points="794.16,-106.04 787.83,-97.54 787.48,-108.13 794.16,-106.04"/>
+</g>
+<!-- Nt2_0&#45;&gt;nx3 -->
+<g id="edge15" class="edge fragment" data-fragment-index="4node 5a:highlight">
+<title>Nt2_0:v0&#45;&gt;nx3</title>
+<path fill="none" stroke="black" d="M779.62,-240.55C779.62,-178.31 723.69,-123.32 688.64,-94.97"/>
+<polygon fill="black" stroke="black" points="691.01,-92.39 680.99,-88.96 686.69,-97.89 691.01,-92.39"/>
+</g>
+<!-- Nt2_0&#45;&gt;x4 -->
+<g id="edge18" class="edge fragment" data-fragment-index="4node">
+<title>Nt2_0:v1&#45;&gt;x4</title>
+<path fill="none" stroke="black" d="M832.75,-258.68C863.63,-258.68 845.9,-220.37 868,-198.8 883.34,-183.83 1002.84,-120.59 1060.32,-90.58"/>
+<polygon fill="black" stroke="black" points="1061.7,-93.81 1068.95,-86.08 1058.46,-87.6 1061.7,-93.81"/>
+</g>
+<!-- Nt2_0&#45;&gt;nx4 -->
+<g id="edge16" class="edge fragment" data-fragment-index="4node 5a:highlight">
+<title>Nt2_0:v0&#45;&gt;nx4</title>
+<path fill="none" stroke="black" d="M779.62,-240.55C779.62,-198.08 888.5,-125.62 942.44,-92.33"/>
+<polygon fill="black" stroke="black" points="944.14,-95.39 950.85,-87.19 940.49,-89.42 944.14,-95.39"/>
+</g>
+<!-- Ct2 -->
+<!-- Ct2&#45;&gt;Cx3 -->
+<g id="edge3" class="edge">
+<title>Ct2&#45;&gt;Cx3</title>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M893.37,-198.8C888.8,-166.17 883.73,-129.91 880.25,-105.05"/>
+</g>
+<!-- Ct2&#45;&gt;Cx4 -->
+<g id="edge4" class="edge">
+<title>Ct2&#45;&gt;Cx4</title>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M912,-269.63C943.13,-249.45 1059.01,-173.63 1150,-105.05"/>
+</g>
+<!-- Nt2_1 -->
+<g id="node18" class="node fragment" data-fragment-index="4node 5:highlight">
+<title>Nt2_1</title>
+<polygon fill="lightgrey" stroke="black" points="620.25,-241.55 620.25,-310.05 689.75,-310.05 689.75,-241.55 620.25,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="655" y="-285.15" font-family="Times,serif" font-size="22.00">∪</text>
+<polyline fill="none" stroke="black" points="620.25,-275.8 689.75,-275.8"/>
+<text xml:space="preserve" text-anchor="middle" x="637.62" y="-250.9" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="655,-241.55 655,-275.8"/>
+<text xml:space="preserve" text-anchor="middle" x="672.38" y="-250.9" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- Nt2_1&#45;&gt;x3 -->
+<g id="edge19" class="edge fragment" data-fragment-index="4node 5:highlight">
+<title>Nt2_1:v0&#45;&gt;x3</title>
+<path fill="none" stroke="black" d="M637.62,-240.55C637.62,-172.18 708.13,-117.88 749.91,-91.71"/>
+<polygon fill="black" stroke="black" points="751.58,-94.78 758.31,-86.6 747.94,-88.8 751.58,-94.78"/>
+</g>
+<!-- Nt2_1&#45;&gt;nx3 -->
+<g id="edge21" class="edge fragment" data-fragment-index="4node">
+<title>Nt2_1:v1&#45;&gt;nx3</title>
+<path fill="none" stroke="black" d="M672.38,-240.55C672.38,-194.78 668.01,-142.08 664.69,-108.58"/>
+<polygon fill="black" stroke="black" points="668.18,-108.26 663.68,-98.66 661.21,-108.97 668.18,-108.26"/>
+</g>
+<!-- Nt2_1&#45;&gt;x4 -->
+<g id="edge22" class="edge fragment" data-fragment-index="4node">
+<title>Nt2_1:v1&#45;&gt;x4</title>
+<path fill="none" stroke="black" d="M690.75,-258.68C721.63,-258.68 701.77,-217.94 726,-198.8 837.29,-110.91 899.49,-158.12 1031,-105.05 1040.91,-101.05 1051.41,-96.02 1060.8,-91.21"/>
+<polygon fill="black" stroke="black" points="1062.28,-94.39 1069.51,-86.65 1059.03,-88.19 1062.28,-94.39"/>
+</g>
+<!-- Nt2_1&#45;&gt;nx4 -->
+<g id="edge20" class="edge fragment" data-fragment-index="4node 5:highlight">
+<title>Nt2_1:v0&#45;&gt;nx4</title>
+<path fill="none" stroke="black" d="M637.62,-240.55C637.62,-223.77 856.66,-125.47 940.18,-88.61"/>
+<polygon fill="black" stroke="black" points="941.45,-91.87 949.19,-84.64 938.63,-85.47 941.45,-91.87"/>
+</g>
+<!-- root -->
+<g id="node19" class="node fragment" data-fragment-index="4node 5:highlight">
+<title>root</title>
+<polygon fill="lightgrey" stroke="black" points="478.88,-455.05 478.88,-523.55 583.12,-523.55 583.12,-455.05 478.88,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="531" y="-498.65" font-family="Times,serif" font-size="22.00">∪</text>
+<polyline fill="none" stroke="black" points="478.88,-489.3 583.12,-489.3"/>
+<text xml:space="preserve" text-anchor="middle" x="496.25" y="-464.4" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="513.62,-455.05 513.62,-489.3"/>
+<text xml:space="preserve" text-anchor="middle" x="531" y="-464.4" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="548.38,-455.05 548.38,-489.3"/>
+<text xml:space="preserve" text-anchor="middle" x="565.75" y="-464.4" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- root&#45;&gt;Nt1_0 -->
+<g id="edge23" class="edge fragment" data-fragment-index="4node 5:highlight">
+<title>root:v0&#45;&gt;Nt1_0</title>
+<path fill="none" stroke="black" d="M477.88,-472.18C396.27,-472.18 341.85,-378.3 316.14,-320.69"/>
+<polygon fill="black" stroke="black" points="319.46,-319.56 312.27,-311.77 313.04,-322.34 319.46,-319.56"/>
+</g>
+<!-- root&#45;&gt;Nt1_1 -->
+<g id="edge25" class="edge fragment" data-fragment-index="4node">
+<title>root:v1&#45;&gt;Nt1_1</title>
+<path fill="none" stroke="black" d="M531,-454.05C531,-404.05 502.17,-353.87 477.15,-319.73"/>
+<polygon fill="black" stroke="black" points="479.95,-317.63 471.13,-311.75 474.36,-321.84 479.95,-317.63"/>
+</g>
+<!-- root&#45;&gt;Nt1_1 -->
+<g id="edge27" class="edge fragment" data-fragment-index="4node">
+<title>root:v2&#45;&gt;Nt1_1</title>
+<path fill="none" stroke="black" d="M565.75,-454.05C565.75,-396.05 520.52,-343.63 484.53,-311.1"/>
+<polygon fill="black" stroke="black" points="487.04,-308.65 477.22,-304.67 482.42,-313.9 487.04,-308.65"/>
+</g>
+<!-- root&#45;&gt;Nt2_0 -->
+<g id="edge26" class="edge fragment" data-fragment-index="4node">
+<title>root:v1&#45;&gt;Nt2_0</title>
+<path fill="none" stroke="black" d="M531,-454.05C531,-440.92 676.37,-350.33 752.18,-303.99"/>
+<polygon fill="black" stroke="black" points="753.95,-307.01 760.66,-298.81 750.3,-301.04 753.95,-307.01"/>
+</g>
+<!-- root&#45;&gt;Nt2_1 -->
+<g id="edge24" class="edge fragment" data-fragment-index="4node 5:highlight">
+<title>root:v0&#45;&gt;Nt2_1</title>
+<path fill="none" stroke="black" d="M496.25,-454.05C496.25,-385.4 563.14,-331.19 610.09,-301.6"/>
+<polygon fill="black" stroke="black" points="611.78,-304.66 618.48,-296.45 608.12,-298.69 611.78,-304.66"/>
+</g>
+<!-- root&#45;&gt;Nt2_1 -->
+<g id="edge28" class="edge fragment" data-fragment-index="4node">
+<title>root:v2&#45;&gt;Nt2_1</title>
+<path fill="none" stroke="black" d="M565.75,-454.05C565.75,-403.98 594.52,-353.63 619.39,-319.46"/>
+<polygon fill="black" stroke="black" points="622.17,-321.58 625.36,-311.48 616.57,-317.38 622.17,-321.58"/>
+</g>
+<!-- Ct3 -->
+<!-- Ct3&#45;&gt;Ct1 -->
+<g id="edge5" class="edge">
+<title>Ct3&#45;&gt;Ct1</title>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M619,-412.3C596.91,-368 569.35,-316.38 556,-291.58"/>
+</g>
+<!-- Ct3&#45;&gt;Ct2 -->
+<g id="edge6" class="edge">
+<title>Ct3&#45;&gt;Ct2</title>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M663,-482.76C692.01,-462.49 793.9,-389.83 868,-318.55"/>
+</g>
+</g>
+</svg>
+
+</div>
+<div class="rstack">
+<div class="fragment fade current-fragment">
+<p>Fix a vtree shape (variables at the leaves).</p>
+</div>
+<div class="fragment fade" data-fragment-index="1input">
+<p>Input nodes: labeled by literals.</p>
+</div>
+<div class="fragment fade" data-fragment-index="2node">
+<p>A node: list of pairs of nodes from the children bags.</p>
+</div>
+<div class="fragment fade" data-fragment-index="3node">
+<p>Another node.</p>
+</div>
+<div class="fragment fade" data-fragment-index="4node">
+<p>Nodes in each bag! The function is accessed via the root node in the
+root bag.</p>
+</div>
+<div class="fragment fade" data-fragment-index="5">
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>¬</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><mo>¬</mo><msub><mi>x</mi><mn>2</mn></msub><mo>,</mo><msub><mi>x</mi><mn>3</mn></msub><mo>,</mo><mo>¬</mo><msub><mi>x</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">\neg x_1, \neg x_2, x_3, \neg x_4</annotation></semantics></math>
+is a model.</p>
+</div>
+<div class="fragment fade" data-fragment-index="5a">
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>¬</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><mo>¬</mo><msub><mi>x</mi><mn>2</mn></msub><mo>,</mo><mo>¬</mo><msub><mi>x</mi><mn>3</mn></msub><mo>,</mo><mo>¬</mo><msub><mi>x</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">\neg x_1, \neg x_2, \neg x_3, \neg x_4</annotation></semantics></math>
+is not a model.</p>
+</div>
+<div class="fragment fade" data-fragment-index="5comment">
+<p><em>Non deterministic TDD</em> (nTDD): So far this is only a rigid
+normal form of <strong>smooth structured DNNF</strong>.</p>
+</div>
+</div>
+</section>
+<section id="bottom-up-determinism" class="slide level2">
+<h2>(Bottom-up) determinism</h2>
+<div class="row">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 13.0.0~dev.20250507.0836 (20250507.0836)
+ -->
+<!-- Title: g Pages: 1 -->
+<svg width="1211pt" height="548pt"
+ viewBox="0.00 0.00 1211.00 548.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 544.05)">
+<title>g</title>
+<polygon fill="none" stroke="none" points="-4,4 -4,-544.05 1207,-544.05 1207,4 -4,4"/>
+<g id="clust1" class="cluster">
+<title>cluster_x1</title>
+<polygon fill="#cccccc" stroke="none" points="8,-8 8,-105.05 262,-105.05 262,-8 8,-8"/>
+<text xml:space="preserve" text-anchor="middle" x="135" y="-17.35" font-family="Times,serif" font-size="22.00">x₁</text>
+</g>
+<g id="clust2" class="cluster">
+<title>cluster_x2</title>
+<polygon fill="#cccccc" stroke="none" points="319,-8 319,-105.05 573,-105.05 573,-8 319,-8"/>
+<text xml:space="preserve" text-anchor="middle" x="446" y="-17.35" font-family="Times,serif" font-size="22.00">x₂</text>
+</g>
+<g id="clust3" class="cluster">
+<title>cluster_x3</title>
+<polygon fill="#cccccc" stroke="none" points="630,-8 630,-105.05 884,-105.05 884,-8 630,-8"/>
+<text xml:space="preserve" text-anchor="middle" x="757" y="-17.35" font-family="Times,serif" font-size="22.00">x₃</text>
+</g>
+<g id="clust4" class="cluster">
+<title>cluster_x4</title>
+<polygon fill="#cccccc" stroke="none" points="941,-8 941,-105.05 1195,-105.05 1195,-8 941,-8"/>
+<text xml:space="preserve" text-anchor="middle" x="1068" y="-17.35" font-family="Times,serif" font-size="22.00">x₄</text>
+</g>
+<g id="clust5" class="cluster">
+<title>cluster_t1</title>
+<polygon fill="#cccccc" stroke="none" points="256,-198.8 256,-318.55 556,-318.55 556,-198.8 256,-198.8"/>
+<text xml:space="preserve" text-anchor="middle" x="406" y="-208.15" font-family="Times,serif" font-size="22.00">t₁</text>
+</g>
+<g id="clust6" class="cluster">
+<title>cluster_t2</title>
+<polygon fill="#cccccc" stroke="none" points="612,-198.8 612,-318.55 912,-318.55 912,-198.8 612,-198.8"/>
+<text xml:space="preserve" text-anchor="middle" x="762" y="-208.15" font-family="Times,serif" font-size="22.00">t₂</text>
+</g>
+<g id="clust7" class="cluster">
+<title>cluster_t3</title>
+<polygon fill="#cccccc" stroke="none" points="471,-412.3 471,-532.05 663,-532.05 663,-412.3 471,-412.3"/>
+<text xml:space="preserve" text-anchor="middle" x="567" y="-421.65" font-family="Times,serif" font-size="22.00">t₃</text>
+</g>
+<!-- x1 -->
+<g id="node1" class="node">
+<title>x1</title>
+<ellipse fill="lightgrey" stroke="black" cx="158" cy="-73.65" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="158" y="-65.88" font-family="Times,serif" font-size="22.00"> x₁</text>
+</g>
+<!-- Cx1 -->
+<!-- nx1 -->
+<g id="node3" class="node fragment visible" data-fragment-index="1:!svghighlight 2:!svghighlight 3:!svghighlight">
+<title>nx1</title>
+<ellipse fill="lightgrey" stroke="black" cx="39" cy="-73.65" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="39" y="-65.88" font-family="Times,serif" font-size="22.00"> ¬x₁</text>
+</g>
+<!-- x2 -->
+<g id="node4" class="node fragment visible" data-fragment-index="2:!svghighlightgreen 3:!svghighlight">
+<title>x2</title>
+<ellipse fill="lightgrey" stroke="black" cx="469" cy="-73.65" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="469" y="-65.88" font-family="Times,serif" font-size="22.00"> x₂</text>
+</g>
+<!-- Cx2 -->
+<!-- nx2 -->
+<g id="node6" class="node fragment visible" data-fragment-index="1:!svghighlight 2:!svghighlight">
+<title>nx2</title>
+<ellipse fill="lightgrey" stroke="black" cx="350" cy="-73.65" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="350" y="-65.88" font-family="Times,serif" font-size="22.00">¬x₂</text>
+</g>
+<!-- x3 -->
+<g id="node7" class="node">
+<title>x3</title>
+<ellipse fill="lightgrey" stroke="black" cx="780" cy="-73.65" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="780" y="-65.88" font-family="Times,serif" font-size="22.00"> x₃</text>
+</g>
+<!-- Cx3 -->
+<!-- nx3 -->
+<g id="node9" class="node fragment visible" data-fragment-index="3:!svghighlight">
+<title>nx3</title>
+<ellipse fill="lightgrey" stroke="black" cx="661" cy="-73.65" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="661" y="-65.88" font-family="Times,serif" font-size="22.00"> ¬x₃</text>
+</g>
+<!-- x4 -->
+<g id="node10" class="node fragment visible" data-fragment-index="3:!svghighlight">
+<title>x4</title>
+<ellipse fill="lightgrey" stroke="black" cx="1091" cy="-73.65" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="1091" y="-65.88" font-family="Times,serif" font-size="22.00">x₄</text>
+</g>
+<!-- Cx4 -->
+<!-- nx4 -->
+<g id="node12" class="node">
+<title>nx4</title>
+<ellipse fill="lightgrey" stroke="black" cx="972" cy="-73.65" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="972" y="-65.88" font-family="Times,serif" font-size="22.00"> ¬x₄</text>
+</g>
+<!-- Nt1_0 -->
+<g id="node13" class="node fragment visible" data-fragment-index="1:!svghighlight 2:!svghighlight">
+<title>Nt1_0</title>
+<polygon fill="lightgrey" stroke="black" points="264.25,-241.55 264.25,-310.05 333.75,-310.05 333.75,-241.55 264.25,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="299" y="-285.15" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="264.25,-275.8 333.75,-275.8"/>
+<text xml:space="preserve" text-anchor="middle" x="281.62" y="-250.9" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="299,-241.55 299,-275.8"/>
+<text xml:space="preserve" text-anchor="middle" x="316.38" y="-250.9" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- Nt1_0&#45;&gt;x1 -->
+<g id="edge9" class="edge">
+<title>Nt1_0:v1&#45;&gt;x1</title>
+<path fill="none" stroke="black" d="M316.38,-240.55C316.38,-167.59 235.24,-114.08 189.12,-89.56"/>
+<polygon fill="black" stroke="black" points="190.87,-86.52 180.38,-85.05 187.66,-92.75 190.87,-86.52"/>
+</g>
+<!-- Nt1_0&#45;&gt;nx1 -->
+<g id="edge7" class="edge fragment visible" data-fragment-index="1:!svghighlight 2:!svghighlight">
+<title>Nt1_0:v0&#45;&gt;nx1</title>
+<path fill="none" stroke="black" d="M263.25,-258.68C166.93,-258.68 89.37,-155.97 56.3,-104.01"/>
+<polygon fill="black" stroke="black" points="59.33,-102.27 51.08,-95.63 53.39,-105.97 59.33,-102.27"/>
+</g>
+<!-- Nt1_0&#45;&gt;x2 -->
+<g id="edge10" class="edge">
+<title>Nt1_0:v1&#45;&gt;x2</title>
+<path fill="none" stroke="black" d="M316.38,-240.55C316.38,-169.35 393.45,-115.57 438.05,-90.4"/>
+<polygon fill="black" stroke="black" points="439.68,-93.5 446.77,-85.63 436.32,-87.36 439.68,-93.5"/>
+</g>
+<!-- Nt1_0&#45;&gt;nx2 -->
+<g id="edge8" class="edge fragment visible" data-fragment-index="1:!svghighlight 2:!svghighlight">
+<title>Nt1_0:v0&#45;&gt;nx2</title>
+<path fill="none" stroke="black" d="M281.62,-240.55C281.62,-188.83 310.39,-134.41 330.6,-102.55"/>
+<polygon fill="black" stroke="black" points="333.45,-104.59 335.99,-94.3 327.59,-100.76 333.45,-104.59"/>
+</g>
+<!-- Ct1 -->
+<!-- Ct1&#45;&gt;Cx1 -->
+<g id="edge1" class="edge">
+<title>Ct1&#45;&gt;Cx1</title>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M512,-198.8C438.56,-127.12 391.25,-153.9 301,-105.05 286.77,-97.35 271.17,-86.8 262,-80.37"/>
+</g>
+<!-- Ct1&#45;&gt;Cx2 -->
+<g id="edge2" class="edge">
+<title>Ct1&#45;&gt;Cx2</title>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M554.46,-198.8C557.23,-166.17 560.31,-129.91 562.42,-105.05"/>
+</g>
+<!-- Nt1_1 -->
+<g id="node15" class="node fragment visible" data-fragment-index="2:!svghighlightgreen 3:!svghighlight">
+<title>Nt1_1</title>
+<polygon fill="lightgrey" stroke="black" points="406.25,-241.55 406.25,-310.05 475.75,-310.05 475.75,-241.55 406.25,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="441" y="-285.15" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="406.25,-275.8 475.75,-275.8"/>
+<text xml:space="preserve" text-anchor="middle" x="423.62" y="-250.9" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="441,-241.55 441,-275.8"/>
+<text xml:space="preserve" text-anchor="middle" x="458.38" y="-250.9" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- Nt1_1&#45;&gt;x1 -->
+<g id="edge11" class="edge">
+<title>Nt1_1:v0&#45;&gt;x1</title>
+<path fill="none" stroke="black" d="M405.25,-258.68C374.37,-258.68 391.86,-220.61 370,-198.8 341.6,-170.46 240.46,-116.73 188.82,-90.23"/>
+<polygon fill="black" stroke="black" points="190.44,-87.13 179.95,-85.7 187.26,-93.36 190.44,-87.13"/>
+</g>
+<!-- Nt1_1&#45;&gt;nx1 -->
+<g id="edge13" class="edge fragment visible" data-fragment-index="2:!svghighlightgreen 3:!svghighlight">
+<title>Nt1_1:v1&#45;&gt;nx1</title>
+<path fill="none" stroke="black" d="M458.38,-240.55C458.38,-197.11 410.22,-215.2 370,-198.8 251.99,-150.68 216.34,-154.8 99,-105.05 89.24,-100.91 78.85,-95.88 69.51,-91.12"/>
+<polygon fill="black" stroke="black" points="71.33,-88.12 60.84,-86.61 68.1,-94.33 71.33,-88.12"/>
+</g>
+<!-- Nt1_1&#45;&gt;x2 -->
+<g id="edge14" class="edge fragment visible" data-fragment-index="2:!svghighlightgreen 3:!svghighlight">
+<title>Nt1_1:v1&#45;&gt;x2</title>
+<path fill="none" stroke="black" d="M458.38,-240.55C458.38,-194.92 462.43,-142.39 465.53,-108.87"/>
+<polygon fill="black" stroke="black" points="469.01,-109.22 466.47,-98.94 462.04,-108.56 469.01,-109.22"/>
+</g>
+<!-- Nt1_1&#45;&gt;nx2 -->
+<g id="edge12" class="edge">
+<title>Nt1_1:v0&#45;&gt;nx2</title>
+<path fill="none" stroke="black" d="M423.62,-240.55C423.62,-187.72 392.05,-132.93 370.25,-101.41"/>
+<polygon fill="black" stroke="black" points="373.37,-99.76 364.73,-93.64 367.67,-103.81 373.37,-99.76"/>
+</g>
+<!-- Nt2_0 -->
+<g id="node16" class="node">
+<title>Nt2_0</title>
+<polygon fill="lightgrey" stroke="black" points="762.25,-241.55 762.25,-310.05 831.75,-310.05 831.75,-241.55 762.25,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="797" y="-285.15" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="762.25,-275.8 831.75,-275.8"/>
+<text xml:space="preserve" text-anchor="middle" x="779.62" y="-250.9" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="797,-241.55 797,-275.8"/>
+<text xml:space="preserve" text-anchor="middle" x="814.38" y="-250.9" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- Nt2_0&#45;&gt;x3 -->
+<g id="edge17" class="edge">
+<title>Nt2_0:v1&#45;&gt;x3</title>
+<path fill="none" stroke="black" d="M814.38,-240.55C814.38,-193.32 800.85,-140.07 790.77,-106.93"/>
+<polygon fill="black" stroke="black" points="794.16,-106.04 787.83,-97.54 787.48,-108.13 794.16,-106.04"/>
+</g>
+<!-- Nt2_0&#45;&gt;nx3 -->
+<g id="edge15" class="edge">
+<title>Nt2_0:v0&#45;&gt;nx3</title>
+<path fill="none" stroke="black" d="M779.62,-240.55C779.62,-178.31 723.69,-123.32 688.64,-94.97"/>
+<polygon fill="black" stroke="black" points="691.01,-92.39 680.99,-88.96 686.69,-97.89 691.01,-92.39"/>
+</g>
+<!-- Nt2_0&#45;&gt;x4 -->
+<g id="edge18" class="edge">
+<title>Nt2_0:v1&#45;&gt;x4</title>
+<path fill="none" stroke="black" d="M832.75,-258.68C863.63,-258.68 845.9,-220.37 868,-198.8 883.34,-183.83 1002.84,-120.59 1060.32,-90.58"/>
+<polygon fill="black" stroke="black" points="1061.7,-93.81 1068.95,-86.08 1058.46,-87.6 1061.7,-93.81"/>
+</g>
+<!-- Nt2_0&#45;&gt;nx4 -->
+<g id="edge16" class="edge">
+<title>Nt2_0:v0&#45;&gt;nx4</title>
+<path fill="none" stroke="black" d="M779.62,-240.55C779.62,-198.08 888.5,-125.62 942.44,-92.33"/>
+<polygon fill="black" stroke="black" points="944.14,-95.39 950.85,-87.19 940.49,-89.42 944.14,-95.39"/>
+</g>
+<!-- Ct2 -->
+<!-- Ct2&#45;&gt;Cx3 -->
+<g id="edge3" class="edge">
+<title>Ct2&#45;&gt;Cx3</title>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M893.37,-198.8C888.8,-166.17 883.73,-129.91 880.25,-105.05"/>
+</g>
+<!-- Ct2&#45;&gt;Cx4 -->
+<g id="edge4" class="edge">
+<title>Ct2&#45;&gt;Cx4</title>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M912,-269.63C943.13,-249.45 1059.01,-173.63 1150,-105.05"/>
+</g>
+<!-- Nt2_1 -->
+<g id="node18" class="node fragment visible" data-fragment-index="3:!svghighlight">
+<title>Nt2_1</title>
+<polygon fill="lightgrey" stroke="black" points="620.25,-241.55 620.25,-310.05 689.75,-310.05 689.75,-241.55 620.25,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="655" y="-285.15" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="620.25,-275.8 689.75,-275.8"/>
+<text xml:space="preserve" text-anchor="middle" x="637.62" y="-250.9" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="655,-241.55 655,-275.8"/>
+<text xml:space="preserve" text-anchor="middle" x="672.38" y="-250.9" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- Nt2_1&#45;&gt;x3 -->
+<g id="edge19" class="edge">
+<title>Nt2_1:v0&#45;&gt;x3</title>
+<path fill="none" stroke="black" d="M637.62,-240.55C637.62,-172.18 708.13,-117.88 749.91,-91.71"/>
+<polygon fill="black" stroke="black" points="751.58,-94.78 758.31,-86.6 747.94,-88.8 751.58,-94.78"/>
+</g>
+<!-- Nt2_1&#45;&gt;nx3 -->
+<g id="edge21" class="edge fragment visible" data-fragment-index="3:!svghighlight">
+<title>Nt2_1:v1&#45;&gt;nx3</title>
+<path fill="none" stroke="black" d="M672.38,-240.55C672.38,-194.78 668.01,-142.08 664.69,-108.58"/>
+<polygon fill="black" stroke="black" points="668.18,-108.26 663.68,-98.66 661.21,-108.97 668.18,-108.26"/>
+</g>
+<!-- Nt2_1&#45;&gt;x4 -->
+<g id="edge22" class="edge fragment visible" data-fragment-index="3:!svghighlight">
+<title>Nt2_1:v1&#45;&gt;x4</title>
+<path fill="none" stroke="black" d="M690.75,-258.68C721.63,-258.68 701.77,-217.94 726,-198.8 837.29,-110.91 899.49,-158.12 1031,-105.05 1040.91,-101.05 1051.41,-96.02 1060.8,-91.21"/>
+<polygon fill="black" stroke="black" points="1062.28,-94.39 1069.51,-86.65 1059.03,-88.19 1062.28,-94.39"/>
+</g>
+<!-- Nt2_1&#45;&gt;nx4 -->
+<g id="edge20" class="edge">
+<title>Nt2_1:v0&#45;&gt;nx4</title>
+<path fill="none" stroke="black" d="M637.62,-240.55C637.62,-223.77 856.66,-125.47 940.18,-88.61"/>
+<polygon fill="black" stroke="black" points="941.45,-91.87 949.19,-84.64 938.63,-85.47 941.45,-91.87"/>
+</g>
+<!-- root -->
+<g id="node19" class="node fragment visible" data-fragment-index="3:!svghighlight">
+<title>root</title>
+<polygon fill="lightgrey" stroke="black" points="478.88,-455.05 478.88,-523.55 583.12,-523.55 583.12,-455.05 478.88,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="531" y="-498.65" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="478.88,-489.3 583.12,-489.3"/>
+<text xml:space="preserve" text-anchor="middle" x="496.25" y="-464.4" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="513.62,-455.05 513.62,-489.3"/>
+<text xml:space="preserve" text-anchor="middle" x="531" y="-464.4" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="548.38,-455.05 548.38,-489.3"/>
+<text xml:space="preserve" text-anchor="middle" x="565.75" y="-464.4" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- root&#45;&gt;Nt1_0 -->
+<g id="edge23" class="edge">
+<title>root:v0&#45;&gt;Nt1_0</title>
+<path fill="none" stroke="black" d="M477.88,-472.18C396.27,-472.18 341.85,-378.3 316.14,-320.69"/>
+<polygon fill="black" stroke="black" points="319.46,-319.56 312.27,-311.77 313.04,-322.34 319.46,-319.56"/>
+</g>
+<!-- root&#45;&gt;Nt1_1 -->
+<g id="edge25" class="edge">
+<title>root:v1&#45;&gt;Nt1_1</title>
+<path fill="none" stroke="black" d="M531,-454.05C531,-404.05 502.17,-353.87 477.15,-319.73"/>
+<polygon fill="black" stroke="black" points="479.95,-317.63 471.13,-311.75 474.36,-321.84 479.95,-317.63"/>
+</g>
+<!-- root&#45;&gt;Nt1_1 -->
+<g id="edge27" class="edge fragment visible" data-fragment-index="3:!svghighlight">
+<title>root:v2&#45;&gt;Nt1_1</title>
+<path fill="none" stroke="black" d="M565.75,-454.05C565.75,-396.05 520.52,-343.63 484.53,-311.1"/>
+<polygon fill="black" stroke="black" points="487.04,-308.65 477.22,-304.67 482.42,-313.9 487.04,-308.65"/>
+</g>
+<!-- root&#45;&gt;Nt2_0 -->
+<g id="edge26" class="edge">
+<title>root:v1&#45;&gt;Nt2_0</title>
+<path fill="none" stroke="black" d="M531,-454.05C531,-440.92 676.37,-350.33 752.18,-303.99"/>
+<polygon fill="black" stroke="black" points="753.95,-307.01 760.66,-298.81 750.3,-301.04 753.95,-307.01"/>
+</g>
+<!-- root&#45;&gt;Nt2_1 -->
+<g id="edge24" class="edge">
+<title>root:v0&#45;&gt;Nt2_1</title>
+<path fill="none" stroke="black" d="M496.25,-454.05C496.25,-385.4 563.14,-331.19 610.09,-301.6"/>
+<polygon fill="black" stroke="black" points="611.78,-304.66 618.48,-296.45 608.12,-298.69 611.78,-304.66"/>
+</g>
+<!-- root&#45;&gt;Nt2_1 -->
+<g id="edge28" class="edge fragment visible" data-fragment-index="3:!svghighlight">
+<title>root:v2&#45;&gt;Nt2_1</title>
+<path fill="none" stroke="black" d="M565.75,-454.05C565.75,-403.98 594.52,-353.63 619.39,-319.46"/>
+<polygon fill="black" stroke="black" points="622.17,-321.58 625.36,-311.48 616.57,-317.38 622.17,-321.58"/>
+</g>
+<!-- Ct3 -->
+<!-- Ct3&#45;&gt;Ct1 -->
+<g id="edge5" class="edge">
+<title>Ct3&#45;&gt;Ct1</title>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M619,-412.3C596.91,-368 569.35,-316.38 556,-291.58"/>
+</g>
+<!-- Ct3&#45;&gt;Ct2 -->
+<g id="edge6" class="edge">
+<title>Ct3&#45;&gt;Ct2</title>
+<path fill="none" stroke="black" stroke-dasharray="1,5" d="M663,-482.76C692.01,-462.49 793.9,-389.83 868,-318.55"/>
+</g>
+</g>
+</svg>
+
+</div>
+<div class="rstack">
+<div class="fragment fade" data-fragment-index="1">
+<p><strong>Bottom-up determinism</strong>: Each pair of sibling nodes
+can be the input of <strong>at most one node</strong>.</p>
+</div>
+<div class="fragment fade" data-fragment-index="2">
+<p>Same node can be used twice, as long as it is used <strong>with
+another sibling</strong>.</p>
+</div>
+<div class="fragment fade" data-fragment-index="3">
+<p>For each assignment of variables and every bag
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>,
+at <strong>most one node</strong> in bag
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
+is satisfied.</p>
+</div>
+</div>
+</section>
+<section id="negation" class="slide level2">
+<h2>Negation</h2>
+<div class="row">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 13.0.0~dev.20250507.0836 (20250507.0836)
+ -->
+<!-- Title: g Pages: 1 -->
+<svg width="919pt" height="514pt"
+ viewBox="0.00 0.00 919.00 514.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 509.8)">
+<title>g</title>
+<polygon fill="none" stroke="none" points="-4,4 -4,-509.8 915,-509.8 915,4 -4,4"/>
+<g id="clust1" class="cluster">
+<title>cluster_x1</title>
+<polygon fill="#cccccc" stroke="none" points="8,-8 8,-70.8 189,-70.8 189,-8 8,-8"/>
+</g>
+<g id="clust2" class="cluster">
+<title>cluster_x2</title>
+<polygon fill="#cccccc" stroke="none" points="246,-8 246,-70.8 427,-70.8 427,-8 246,-8"/>
+</g>
+<g id="clust3" class="cluster">
+<title>cluster_x3</title>
+<polygon fill="#cccccc" stroke="none" points="484,-8 484,-70.8 665,-70.8 665,-8 484,-8"/>
+</g>
+<g id="clust4" class="cluster">
+<title>cluster_x4</title>
+<polygon fill="#cccccc" stroke="none" points="722,-8 722,-70.8 903,-70.8 903,-8 722,-8"/>
+</g>
+<g id="clust5" class="cluster">
+<title>cluster_t1</title>
+<polygon fill="#cccccc" stroke="none" points="104,-164.55 104,-284.3 427,-284.3 427,-164.55 104,-164.55"/>
+<text xml:space="preserve" text-anchor="middle" x="265.5" y="-173.9" font-family="Times,serif" font-size="22.00">t₁</text>
+</g>
+<g id="clust6" class="cluster">
+<title>cluster_t2</title>
+<polygon fill="#cccccc" stroke="none" points="484,-164.55 484,-284.3 806,-284.3 806,-164.55 484,-164.55"/>
+<text xml:space="preserve" text-anchor="middle" x="645" y="-173.9" font-family="Times,serif" font-size="22.00">t₂</text>
+</g>
+<g id="clust7" class="cluster">
+<title>cluster_t0</title>
+<polygon fill="#cccccc" stroke="none" points="196,-378.05 196,-497.8 597,-497.8 597,-378.05 196,-378.05"/>
+<text xml:space="preserve" text-anchor="middle" x="396.5" y="-387.4" font-family="Times,serif" font-size="22.00">t₀</text>
+</g>
+<!-- x1 -->
+<g id="node1" class="node">
+<title>x1</title>
+<ellipse fill="lightgrey" stroke="black" cx="158" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="158" y="-31.63" font-family="Times,serif" font-size="22.00">x₁</text>
+</g>
+<!-- nx1 -->
+<g id="node2" class="node">
+<title>nx1</title>
+<ellipse fill="lightgrey" stroke="black" cx="39" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="39" y="-31.63" font-family="Times,serif" font-size="22.00">¬x₁</text>
+</g>
+<!-- x2 -->
+<g id="node3" class="node">
+<title>x2</title>
+<ellipse fill="lightgrey" stroke="black" cx="277" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="277" y="-31.63" font-family="Times,serif" font-size="22.00">x₂</text>
+</g>
+<!-- nx2 -->
+<g id="node4" class="node">
+<title>nx2</title>
+<ellipse fill="lightgrey" stroke="black" cx="396" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="396" y="-31.63" font-family="Times,serif" font-size="22.00">¬x₂</text>
+</g>
+<!-- x3 -->
+<g id="node5" class="node">
+<title>x3</title>
+<ellipse fill="lightgrey" stroke="black" cx="634" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="634" y="-31.63" font-family="Times,serif" font-size="22.00">x₃</text>
+</g>
+<!-- nx3 -->
+<g id="node6" class="node">
+<title>nx3</title>
+<ellipse fill="lightgrey" stroke="black" cx="515" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="515" y="-31.63" font-family="Times,serif" font-size="22.00">¬x₃</text>
+</g>
+<!-- x4 -->
+<g id="node7" class="node">
+<title>x4</title>
+<ellipse fill="lightgrey" stroke="black" cx="753" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="753" y="-31.63" font-family="Times,serif" font-size="22.00">x₄</text>
+</g>
+<!-- nx4 -->
+<g id="node8" class="node">
+<title>nx4</title>
+<ellipse fill="lightgrey" stroke="black" cx="872" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="872" y="-31.63" font-family="Times,serif" font-size="22.00">¬x₄</text>
+</g>
+<!-- x1eqx2 -->
+<g id="node9" class="node">
+<title>x1eqx2</title>
+<polygon fill="lightgrey" stroke="black" points="112.25,-207.3 112.25,-275.8 181.75,-275.8 181.75,-207.3 112.25,-207.3"/>
+<text xml:space="preserve" text-anchor="middle" x="147" y="-250.9" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="112.25,-241.55 181.75,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="129.62" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="147,-207.3 147,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="164.38" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- x1eqx2&#45;&gt;x1 -->
+<g id="edge3" class="edge">
+<title>x1eqx2:v1&#45;&gt;x1</title>
+<path fill="none" stroke="black" d="M164.38,-206.3C164.38,-160.73 161.94,-108.18 160.08,-74.65"/>
+<polygon fill="black" stroke="black" points="163.58,-74.49 159.52,-64.71 156.59,-74.89 163.58,-74.49"/>
+</g>
+<!-- x1eqx2&#45;&gt;nx1 -->
+<g id="edge1" class="edge">
+<title>x1eqx2:v0&#45;&gt;nx1</title>
+<path fill="none" stroke="black" d="M129.62,-206.3C129.62,-150.44 89.57,-95.53 62.72,-64.99"/>
+<polygon fill="black" stroke="black" points="65.52,-62.87 56.22,-57.81 60.33,-67.57 65.52,-62.87"/>
+</g>
+<!-- x1eqx2&#45;&gt;x2 -->
+<g id="edge4" class="edge">
+<title>x1eqx2:v1&#45;&gt;x2</title>
+<path fill="none" stroke="black" d="M164.38,-206.3C164.38,-145.42 216.93,-90.3 250.24,-61.48"/>
+<polygon fill="black" stroke="black" points="252.1,-64.49 257.5,-55.37 247.59,-59.13 252.1,-64.49"/>
+</g>
+<!-- x1eqx2&#45;&gt;nx2 -->
+<g id="edge2" class="edge">
+<title>x1eqx2:v0&#45;&gt;nx2</title>
+<path fill="none" stroke="black" d="M129.62,-206.3C129.62,-178.83 294.9,-91.7 365.08,-55.94"/>
+<polygon fill="black" stroke="black" points="366.42,-59.19 373.75,-51.54 363.25,-52.95 366.42,-59.19"/>
+</g>
+<!-- x1ltx2 -->
+<g id="node10" class="node">
+<title>x1ltx2</title>
+<polygon fill="lightgrey" stroke="black" points="253.6,-207.3 253.6,-275.8 300.4,-275.8 300.4,-207.3 253.6,-207.3"/>
+<text xml:space="preserve" text-anchor="middle" x="276.98" y="-250.9" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="253.6,-241.55 300.35,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="276.98" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- x1ltx2&#45;&gt;nx1 -->
+<g id="edge5" class="edge">
+<title>x1ltx2:v0&#45;&gt;nx1</title>
+<path fill="none" stroke="black" d="M252.6,-224.43C221.87,-224.43 238.82,-187.16 218,-164.55 173.86,-116.61 108.05,-76.96 69.74,-56.16"/>
+<polygon fill="black" stroke="black" points="71.5,-53.14 61.03,-51.52 68.21,-59.31 71.5,-53.14"/>
+</g>
+<!-- x1ltx2&#45;&gt;x2 -->
+<g id="edge6" class="edge">
+<title>x1ltx2:v0&#45;&gt;x2</title>
+<path fill="none" stroke="black" d="M276.98,-206.3C276.98,-160.77 276.98,-108.21 276.99,-74.66"/>
+<polygon fill="black" stroke="black" points="280.49,-74.72 276.99,-64.72 273.49,-74.72 280.49,-74.72"/>
+</g>
+<!-- x2ltx1 -->
+<g id="node11" class="node fragment" data-fragment-index="1">
+<title>x2ltx1</title>
+<polygon fill="#dc322f" stroke="#dc322f" points="372.6,-207.3 372.6,-275.8 419.4,-275.8 419.4,-207.3 372.6,-207.3"/>
+<text xml:space="preserve" text-anchor="middle" x="395.98" y="-250.9" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="#dc322f" points="372.6,-241.55 419.35,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="395.98" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- x2ltx1&#45;&gt;x1 -->
+<g id="edge8" class="edge fragment" data-fragment-index="1">
+<title>x2ltx1:v0&#45;&gt;x1</title>
+<path fill="none" stroke="#dc322f" d="M371.6,-224.43C340.64,-224.43 357.08,-187.22 336,-164.55 291.91,-117.14 226.81,-77.44 188.77,-56.46"/>
+<polygon fill="#dc322f" stroke="#dc322f" points="190.58,-53.46 180.13,-51.77 187.25,-59.61 190.58,-53.46"/>
+</g>
+<!-- x2ltx1&#45;&gt;nx2 -->
+<g id="edge7" class="edge fragment" data-fragment-index="1">
+<title>x2ltx1:v0&#45;&gt;nx2</title>
+<path fill="none" stroke="#dc322f" d="M395.98,-206.3C395.98,-160.77 395.98,-108.21 395.99,-74.66"/>
+<polygon fill="#dc322f" stroke="#dc322f" points="399.49,-74.72 395.99,-64.72 392.49,-74.72 399.49,-74.72"/>
+</g>
+<!-- x3eqx4 -->
+<g id="node12" class="node">
+<title>x3eqx4</title>
+<polygon fill="lightgrey" stroke="black" points="610.25,-207.3 610.25,-275.8 679.75,-275.8 679.75,-207.3 610.25,-207.3"/>
+<text xml:space="preserve" text-anchor="middle" x="645" y="-250.9" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="610.25,-241.55 679.75,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="627.62" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="645,-207.3 645,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="662.38" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- x3eqx4&#45;&gt;x3 -->
+<g id="edge11" class="edge">
+<title>x3eqx4:v1&#45;&gt;x3</title>
+<path fill="none" stroke="black" d="M662.38,-206.3C662.38,-159.64 651.34,-106.65 643.03,-73.37"/>
+<polygon fill="black" stroke="black" points="646.48,-72.75 640.6,-63.93 639.7,-74.49 646.48,-72.75"/>
+</g>
+<!-- x3eqx4&#45;&gt;nx3 -->
+<g id="edge9" class="edge">
+<title>x3eqx4:v0&#45;&gt;nx3</title>
+<path fill="none" stroke="black" d="M627.62,-206.3C627.62,-145.42 575.07,-90.3 541.76,-61.48"/>
+<polygon fill="black" stroke="black" points="544.41,-59.13 534.5,-55.37 539.9,-64.49 544.41,-59.13"/>
+</g>
+<!-- x3eqx4&#45;&gt;x4 -->
+<g id="edge12" class="edge">
+<title>x3eqx4:v1&#45;&gt;x4</title>
+<path fill="none" stroke="black" d="M662.38,-206.3C662.38,-150.44 702.43,-95.53 729.28,-64.99"/>
+<polygon fill="black" stroke="black" points="731.67,-67.57 735.78,-57.81 726.48,-62.87 731.67,-67.57"/>
+</g>
+<!-- x3eqx4&#45;&gt;nx4 -->
+<g id="edge10" class="edge">
+<title>x3eqx4:v0&#45;&gt;nx4</title>
+<path fill="none" stroke="black" d="M627.62,-206.3C627.62,-180.68 776.5,-93.99 841.85,-57.17"/>
+<polygon fill="black" stroke="black" points="843.26,-60.39 850.27,-52.44 839.83,-54.29 843.26,-60.39"/>
+</g>
+<!-- x3ltx4 -->
+<g id="node13" class="node">
+<title>x3ltx4</title>
+<polygon fill="lightgrey" stroke="black" points="491.6,-207.3 491.6,-275.8 538.4,-275.8 538.4,-207.3 491.6,-207.3"/>
+<text xml:space="preserve" text-anchor="middle" x="514.98" y="-250.9" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="491.6,-241.55 538.35,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="514.98" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- x3ltx4&#45;&gt;nx3 -->
+<g id="edge13" class="edge">
+<title>x3ltx4:v0&#45;&gt;nx3</title>
+<path fill="none" stroke="black" d="M514.98,-206.3C514.98,-160.77 514.98,-108.21 514.99,-74.66"/>
+<polygon fill="black" stroke="black" points="518.49,-74.72 514.99,-64.72 511.49,-74.72 518.49,-74.72"/>
+</g>
+<!-- x3ltx4&#45;&gt;x4 -->
+<g id="edge14" class="edge">
+<title>x3ltx4:v0&#45;&gt;x4</title>
+<path fill="none" stroke="black" d="M539.35,-224.43C570.1,-224.43 553.17,-187.16 574,-164.55 618.16,-116.63 683.96,-76.97 722.27,-56.17"/>
+<polygon fill="black" stroke="black" points="723.8,-59.32 730.97,-51.52 720.5,-53.14 723.8,-59.32"/>
+</g>
+<!-- x4ltx3 -->
+<g id="node14" class="node fragment" data-fragment-index="2">
+<title>x4ltx3</title>
+<polygon fill="#dc322f" stroke="#dc322f" points="751.6,-207.3 751.6,-275.8 798.4,-275.8 798.4,-207.3 751.6,-207.3"/>
+<text xml:space="preserve" text-anchor="middle" x="774.98" y="-250.9" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="#dc322f" points="751.6,-241.55 798.35,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="774.98" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- x4ltx3&#45;&gt;x3 -->
+<g id="edge16" class="edge fragment" data-fragment-index="2">
+<title>x4ltx3:v0&#45;&gt;x3</title>
+<path fill="none" stroke="#dc322f" d="M750.6,-224.43C719.87,-224.43 732.17,-190.69 716,-164.55 695.25,-131 670.07,-93.29 653.14,-68.33"/>
+<polygon fill="#dc322f" stroke="#dc322f" points="656.23,-66.65 647.71,-60.35 650.44,-70.59 656.23,-66.65"/>
+</g>
+<!-- x4ltx3&#45;&gt;nx4 -->
+<g id="edge15" class="edge fragment" data-fragment-index="2">
+<title>x4ltx3:v0&#45;&gt;nx4</title>
+<path fill="none" stroke="#dc322f" d="M774.98,-206.3C774.98,-149.21 818.32,-94.32 847.07,-64.2"/>
+<polygon fill="#dc322f" stroke="#dc322f" points="849.53,-66.69 854.04,-57.1 844.53,-61.78 849.53,-66.69"/>
+</g>
+<!-- out -->
+<g id="node15" class="node">
+<title>out</title>
+<polygon fill="lightgrey" stroke="black" points="204.25,-420.8 204.25,-489.3 273.75,-489.3 273.75,-420.8 204.25,-420.8"/>
+<text xml:space="preserve" text-anchor="middle" x="239" y="-464.4" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="204.25,-455.05 273.75,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="221.62" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="239,-420.8 239,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="256.38" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- out&#45;&gt;x1eqx2 -->
+<g id="edge17" class="edge">
+<title>out:v0&#45;&gt;x1eqx2</title>
+<path fill="none" stroke="black" d="M221.62,-419.8C221.62,-371.18 197.48,-320.52 176.65,-285.87"/>
+<polygon fill="black" stroke="black" points="179.64,-284.05 171.41,-277.38 173.69,-287.73 179.64,-284.05"/>
+</g>
+<!-- out&#45;&gt;x1ltx2 -->
+<g id="edge19" class="edge">
+<title>out:v1&#45;&gt;x1ltx2</title>
+<path fill="none" stroke="black" d="M256.38,-419.8C256.38,-374.37 263.14,-322.83 268.92,-287.09"/>
+<polygon fill="black" stroke="black" points="272.32,-288 270.51,-277.56 265.41,-286.85 272.32,-288"/>
+</g>
+<!-- out&#45;&gt;x3eqx4 -->
+<g id="edge18" class="edge">
+<title>out:v0&#45;&gt;x3eqx4</title>
+<path fill="none" stroke="black" d="M221.62,-419.8C221.62,-376.76 269.24,-394.53 309,-378.05 424.41,-330.22 460.75,-337.04 574,-284.3 582.66,-280.27 591.65,-275.49 600.19,-270.64"/>
+<polygon fill="black" stroke="black" points="601.78,-273.76 608.66,-265.71 598.25,-267.71 601.78,-273.76"/>
+</g>
+<!-- out&#45;&gt;x3ltx4 -->
+<g id="edge20" class="edge">
+<title>out:v1&#45;&gt;x3ltx4</title>
+<path fill="none" stroke="black" d="M274.75,-437.93C305.41,-437.93 288.01,-400.39 309,-378.05 322.76,-363.4 427.21,-297.32 481.87,-263.15"/>
+<polygon fill="black" stroke="black" points="483.55,-266.23 490.18,-257.96 479.84,-260.29 483.55,-266.23"/>
+</g>
+<!-- nout -->
+<g id="node16" class="node fragment" data-fragment-index="3 12:svghighlightgreen">
+<title>nout</title>
+<polygon fill="#dc322f" stroke="#dc322f" points="345.38,-420.8 345.38,-489.3 588.62,-489.3 588.62,-420.8 345.38,-420.8"/>
+<text xml:space="preserve" text-anchor="middle" x="467" y="-464.4" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="#dc322f" points="345.38,-455.05 588.62,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="362.75" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="#dc322f" points="380.12,-420.8 380.12,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="397.5" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="#dc322f" points="414.88,-420.8 414.88,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="432.25" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="#dc322f" points="449.62,-420.8 449.62,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="467" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="#dc322f" points="484.38,-420.8 484.38,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="501.75" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="#dc322f" points="519.12,-420.8 519.12,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="536.5" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="#dc322f" points="553.88,-420.8 553.88,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="571.25" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- nout&#45;&gt;x1eqx2 -->
+<g id="edge21" class="edge fragment" data-fragment-index="4">
+<title>nout:v0&#45;&gt;x1eqx2</title>
+<path fill="none" stroke="#dc322f" d="M344.38,-437.93C313.69,-437.93 329.75,-401.53 310,-378.05 275,-336.43 226.08,-297.7 190.98,-272.4"/>
+<polygon fill="#dc322f" stroke="#dc322f" points="193.33,-269.78 183.16,-266.83 189.27,-275.48 193.33,-269.78"/>
+</g>
+<!-- nout&#45;&gt;x1eqx2 -->
+<g id="edge25" class="edge fragment" data-fragment-index="6">
+<title>nout:v2&#45;&gt;x1eqx2</title>
+<path fill="none" stroke="#dc322f" d="M432.25,-419.8C432.25,-412.81 272.14,-316.8 191.83,-269.08"/>
+<polygon fill="#dc322f" stroke="#dc322f" points="193.66,-266.11 183.28,-264.01 190.09,-272.13 193.66,-266.11"/>
+</g>
+<!-- nout&#45;&gt;x1ltx2 -->
+<g id="edge23" class="edge fragment" data-fragment-index="5">
+<title>nout:v1&#45;&gt;x1ltx2</title>
+<path fill="none" stroke="#dc322f" d="M397.5,-419.8C397.5,-357.03 345.17,-300.01 309.48,-268.43"/>
+<polygon fill="#dc322f" stroke="#dc322f" points="311.81,-265.82 301.95,-261.95 307.25,-271.12 311.81,-265.82"/>
+</g>
+<!-- nout&#45;&gt;x1ltx2 -->
+<g id="edge27" class="edge fragment" data-fragment-index="7">
+<title>nout:v3&#45;&gt;x1ltx2</title>
+<path fill="none" stroke="#dc322f" d="M467,-419.8C467,-398.53 363.89,-312.41 309.58,-268.52"/>
+<polygon fill="#dc322f" stroke="#dc322f" points="311.84,-265.85 301.86,-262.3 307.45,-271.3 311.84,-265.85"/>
+</g>
+<!-- nout&#45;&gt;x2ltx1 -->
+<g id="edge29" class="edge fragment" data-fragment-index="8">
+<title>nout:v4&#45;&gt;x2ltx1</title>
+<path fill="none" stroke="#dc322f" d="M501.75,-419.8C501.75,-361.17 458.54,-305.07 427.37,-272.22"/>
+<polygon fill="#dc322f" stroke="#dc322f" points="430.27,-270.19 420.79,-265.47 425.26,-275.08 430.27,-270.19"/>
+</g>
+<!-- nout&#45;&gt;x2ltx1 -->
+<g id="edge31" class="edge fragment" data-fragment-index="9">
+<title>nout:v5&#45;&gt;x2ltx1</title>
+<path fill="none" stroke="#dc322f" d="M536.5,-419.8C536.5,-350.95 470.59,-293.26 429.05,-263.74"/>
+<polygon fill="#dc322f" stroke="#dc322f" points="431.29,-261.04 421.08,-258.23 427.31,-266.8 431.29,-261.04"/>
+</g>
+<!-- nout&#45;&gt;x2ltx1 -->
+<g id="edge33" class="edge fragment" data-fragment-index="10">
+<title>nout:v6&#45;&gt;x2ltx1</title>
+<path fill="none" stroke="#dc322f" d="M571.25,-419.8C571.25,-379.67 479.28,-304.66 428.59,-266.37"/>
+<polygon fill="#dc322f" stroke="#dc322f" points="430.95,-263.76 420.85,-260.57 426.75,-269.37 430.95,-263.76"/>
+</g>
+<!-- nout&#45;&gt;x3eqx4 -->
+<g id="edge24" class="edge fragment" data-fragment-index="5">
+<title>nout:v1&#45;&gt;x3eqx4</title>
+<path fill="none" stroke="#dc322f" d="M397.5,-419.8C397.5,-395.16 528.83,-312.37 600.16,-269.21"/>
+<polygon fill="#dc322f" stroke="#dc322f" points="601.75,-272.34 608.51,-264.18 598.13,-266.35 601.75,-272.34"/>
+</g>
+<!-- nout&#45;&gt;x3eqx4 -->
+<g id="edge30" class="edge fragment" data-fragment-index="8">
+<title>nout:v4&#45;&gt;x3eqx4</title>
+<path fill="none" stroke="#dc322f" d="M501.75,-419.8C501.75,-355.98 558.62,-302.21 600.7,-271.17"/>
+<polygon fill="#dc322f" stroke="#dc322f" points="602.64,-274.08 608.73,-265.4 598.56,-268.39 602.64,-274.08"/>
+</g>
+<!-- nout&#45;&gt;x3ltx4 -->
+<g id="edge22" class="edge fragment" data-fragment-index="4">
+<title>nout:v0&#45;&gt;x3ltx4</title>
+<path fill="none" stroke="#dc322f" d="M362.75,-419.8C362.75,-347.39 436.77,-289.78 481.59,-261.54"/>
+<polygon fill="#dc322f" stroke="#dc322f" points="483.22,-264.64 489.92,-256.43 479.57,-258.67 483.22,-264.64"/>
+</g>
+<!-- nout&#45;&gt;x3ltx4 -->
+<g id="edge32" class="edge fragment" data-fragment-index="9">
+<title>nout:v5&#45;&gt;x3ltx4</title>
+<path fill="none" stroke="#dc322f" d="M536.5,-419.8C536.5,-374.35 529.45,-322.81 523.42,-287.07"/>
+<polygon fill="#dc322f" stroke="#dc322f" points="526.92,-286.8 521.77,-277.54 520.03,-288 526.92,-286.8"/>
+</g>
+<!-- nout&#45;&gt;x4ltx3 -->
+<g id="edge26" class="edge fragment" data-fragment-index="6">
+<title>nout:v2&#45;&gt;x4ltx3</title>
+<path fill="none" stroke="#dc322f" d="M432.25,-419.8C432.25,-280.05 595.47,-355.03 716,-284.3 724.63,-279.23 733.62,-273.27 741.89,-267.46"/>
+<polygon fill="#dc322f" stroke="#dc322f" points="743.9,-270.33 749.99,-261.66 739.82,-264.64 743.9,-270.33"/>
+</g>
+<!-- nout&#45;&gt;x4ltx3 -->
+<g id="edge28" class="edge fragment" data-fragment-index="7">
+<title>nout:v3&#45;&gt;x4ltx3</title>
+<path fill="none" stroke="#dc322f" d="M467,-419.8C467,-293.81 609.06,-350.91 716,-284.3 724.67,-278.9 733.79,-272.72 742.19,-266.79"/>
+<polygon fill="#dc322f" stroke="#dc322f" points="743.99,-269.81 750.09,-261.15 739.92,-264.11 743.99,-269.81"/>
+</g>
+<!-- nout&#45;&gt;x4ltx3 -->
+<g id="edge34" class="edge fragment" data-fragment-index="10">
+<title>nout:v6&#45;&gt;x4ltx3</title>
+<path fill="none" stroke="#dc322f" d="M589.62,-437.93C672.6,-437.93 729.61,-344.05 756.79,-286.44"/>
+<polygon fill="#dc322f" stroke="#dc322f" points="759.9,-288.06 760.88,-277.51 753.53,-285.14 759.9,-288.06"/>
+</g>
+</g>
+</svg>
+
+</div>
+<div class="rstack">
+<div class="fragment fade" data-fragment-index="1 2 3 4 5">
+<p>For each vtree node
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>,
+add <strong>just one</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>-node
+that will take all missing pairs; <strong>bottom up!</strong></p>
+</div>
+<div class="fragment fade" data-fragment-index="6 7 8 9 10">
+<p><strong>Bottom up:</strong> also add missing pairs with red nodes
+below!</p>
+</div>
+<div class="fragment fade" data-fragment-index="11">
+<p><strong>Red nodes</strong> accept the rejected assignments at each
+level.</p>
+</div>
+<div class="fragment fade" data-fragment-index="12">
+<p><strong>Green node</strong> computes the negation (new output).</p>
+</div>
+<div class="fragment" data-fragment-index="13">
+<p>Complexity:
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>#</mi><mi>v</mi><mi>a</mi><mi>r</mi><mi>s</mi><mo>⋅</mo><msup><mi>w</mi><mn>2</mn></msup><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(\#vars \cdot w^2)</annotation></semantics></math>
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>w</mi><annotation encoding="application/x-tex">w</annotation></semantics></math>
+is the <strong>width</strong>, ie, maximum number of nodes in a bag.</p>
+</div>
+</div>
+</section>
+<section>
+<section id="canonicity-and-minimization"
+class="title-slide slide level1 full-title canonicity">
+<h1 class="full-title canonicity"><span>Canonicity and
+Minimization</span></h1>
+
+</section>
+<section id="twins-contraction" class="slide level2">
+<h2>Twins contraction</h2>
+<div class="rstack">
+<div class="row fragment visible"
+data-fragment-index="twinmerge:hide,-visible">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 13.0.0~dev.20250507.0836 (20250507.0836)
+ -->
+<!-- Title: g Pages: 1 -->
+<svg width="919pt" height="514pt"
+ viewBox="0.00 0.00 919.00 514.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 509.8)">
+<title>g</title>
+<polygon fill="none" stroke="none" points="-4,4 -4,-509.8 915,-509.8 915,4 -4,4"/>
+<g id="clust1" class="cluster">
+<title>cluster_x1</title>
+<polygon fill="#cccccc" stroke="none" points="8,-8 8,-70.8 189,-70.8 189,-8 8,-8"/>
+</g>
+<g id="clust2" class="cluster">
+<title>cluster_x2</title>
+<polygon fill="#cccccc" stroke="none" points="246,-8 246,-70.8 427,-70.8 427,-8 246,-8"/>
+</g>
+<g id="clust3" class="cluster">
+<title>cluster_x3</title>
+<polygon fill="#cccccc" stroke="none" points="484,-8 484,-70.8 665,-70.8 665,-8 484,-8"/>
+</g>
+<g id="clust4" class="cluster">
+<title>cluster_x4</title>
+<polygon fill="#cccccc" stroke="none" points="722,-8 722,-70.8 903,-70.8 903,-8 722,-8"/>
+</g>
+<g id="clust5" class="cluster">
+<title>cluster_t1</title>
+<polygon fill="#cccccc" stroke="none" points="175,-164.55 175,-284.3 475,-284.3 475,-164.55 175,-164.55"/>
+<text xml:space="preserve" text-anchor="middle" x="325" y="-173.9" font-family="Times,serif" font-size="22.00">t₁</text>
+</g>
+<g id="clust6" class="cluster">
+<title>cluster_t2</title>
+<polygon fill="#cccccc" stroke="none" points="531,-164.55 531,-284.3 854,-284.3 854,-164.55 531,-164.55"/>
+<text xml:space="preserve" text-anchor="middle" x="692.5" y="-173.9" font-family="Times,serif" font-size="22.00">t₂</text>
+</g>
+<g id="clust7" class="cluster">
+<title>cluster_t3</title>
+<polygon fill="#cccccc" stroke="none" points="432,-378.05 432,-497.8 764,-497.8 764,-378.05 432,-378.05"/>
+<text xml:space="preserve" text-anchor="middle" x="598" y="-387.4" font-family="Times,serif" font-size="22.00">t₃</text>
+</g>
+<!-- x1 -->
+<g id="node1" class="node">
+<title>x1</title>
+<ellipse fill="lightgrey" stroke="black" cx="39" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="39" y="-31.63" font-family="Times,serif" font-size="22.00">x₁</text>
+</g>
+<!-- nx1 -->
+<g id="node2" class="node">
+<title>nx1</title>
+<ellipse fill="lightgrey" stroke="black" cx="158" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="158" y="-31.63" font-family="Times,serif" font-size="22.00">¬x₁</text>
+</g>
+<!-- x2 -->
+<g id="node3" class="node">
+<title>x2</title>
+<ellipse fill="lightgrey" stroke="black" cx="277" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="277" y="-31.63" font-family="Times,serif" font-size="22.00">x₂</text>
+</g>
+<!-- nx2 -->
+<g id="node4" class="node">
+<title>nx2</title>
+<ellipse fill="lightgrey" stroke="black" cx="396" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="396" y="-31.63" font-family="Times,serif" font-size="22.00">¬x₂</text>
+</g>
+<!-- x3 -->
+<g id="node5" class="node">
+<title>x3</title>
+<ellipse fill="lightgrey" stroke="black" cx="515" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="515" y="-31.63" font-family="Times,serif" font-size="22.00">x₃</text>
+</g>
+<!-- nx3 -->
+<g id="node6" class="node">
+<title>nx3</title>
+<ellipse fill="lightgrey" stroke="black" cx="634" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="634" y="-31.63" font-family="Times,serif" font-size="22.00">¬x₃</text>
+</g>
+<!-- x4 -->
+<g id="node7" class="node">
+<title>x4</title>
+<ellipse fill="lightgrey" stroke="black" cx="753" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="753" y="-31.63" font-family="Times,serif" font-size="22.00">x₄</text>
+</g>
+<!-- nx4 -->
+<g id="node8" class="node">
+<title>nx4</title>
+<ellipse fill="lightgrey" stroke="black" cx="872" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="872" y="-31.63" font-family="Times,serif" font-size="22.00">¬x₄</text>
+</g>
+<!-- nx1nx2 -->
+<g id="node9" class="node fragment visible" data-fragment-index="twin0:!svghighlight twin1:!svghighlight twin2:!svghighlight">
+<title>nx1nx2</title>
+<polygon fill="lightgrey" stroke="black" points="420.6,-207.3 420.6,-275.8 467.4,-275.8 467.4,-207.3 420.6,-207.3"/>
+<text xml:space="preserve" text-anchor="middle" x="443.98" y="-250.9" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="420.6,-241.55 467.35,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="443.98" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- nx1nx2&#45;&gt;nx1 -->
+<g id="edge3" class="edge">
+<title>nx1nx2:v0&#45;&gt;nx1</title>
+<path fill="none" stroke="black" d="M419.6,-224.43C388.64,-224.43 406.26,-186.07 384,-164.55 353.45,-135.02 243.92,-81.01 189.36,-55.07"/>
+<polygon fill="black" stroke="black" points="191.12,-52.03 180.58,-50.92 188.13,-58.36 191.12,-52.03"/>
+</g>
+<!-- nx1nx2&#45;&gt;nx2 -->
+<g id="edge4" class="edge">
+<title>nx1nx2:v0&#45;&gt;nx2</title>
+<path fill="none" stroke="black" d="M443.98,-206.3C443.98,-157.68 424.72,-104.08 410.61,-71.33"/>
+<polygon fill="black" stroke="black" points="413.92,-70.16 406.67,-62.44 407.52,-73 413.92,-70.16"/>
+</g>
+<!-- x1x2 -->
+<g id="node10" class="node fragment visible" data-fragment-index="notwin0:!svghighlight notwin1:!svghighlight notwin2:!svghighlight &#160;twin0:!svghighlight twin1:!svghighlight twin2:!svghighlight">
+<title>x1x2</title>
+<polygon fill="lightgrey" stroke="black" points="182.6,-207.3 182.6,-275.8 229.4,-275.8 229.4,-207.3 182.6,-207.3"/>
+<text xml:space="preserve" text-anchor="middle" x="205.97" y="-250.9" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="182.6,-241.55 229.35,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="205.97" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- x1x2&#45;&gt;x1 -->
+<g id="edge5" class="edge">
+<title>x1x2:v0&#45;&gt;x1</title>
+<path fill="none" stroke="black" d="M181.6,-224.43C105.91,-224.43 64.65,-125.96 47.95,-73.08"/>
+<polygon fill="black" stroke="black" points="51.35,-72.24 45.11,-63.68 44.65,-74.27 51.35,-72.24"/>
+</g>
+<!-- x1x2&#45;&gt;x2 -->
+<g id="edge6" class="edge">
+<title>x1x2:v0&#45;&gt;x2</title>
+<path fill="none" stroke="black" d="M205.97,-206.3C205.97,-154.28 235.85,-99.95 256.85,-68.19"/>
+<polygon fill="black" stroke="black" points="259.72,-70.19 262.45,-59.96 253.93,-66.26 259.72,-70.19"/>
+</g>
+<!-- x1nx2 -->
+<g id="node11" class="node fragment visible" data-fragment-index="notwin0:!svghighlight notwin1:!svghighlight notwin2:!svghighlight">
+<title>x1nx2</title>
+<polygon fill="lightgrey" stroke="black" points="301.6,-207.3 301.6,-275.8 348.4,-275.8 348.4,-207.3 301.6,-207.3"/>
+<text xml:space="preserve" text-anchor="middle" x="324.98" y="-250.9" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="301.6,-241.55 348.35,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="324.98" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- x1nx2&#45;&gt;x1 -->
+<g id="edge1" class="edge">
+<title>x1nx2:v0&#45;&gt;x1</title>
+<path fill="none" stroke="black" d="M300.6,-224.43C269.64,-224.43 287.26,-186.07 265,-164.55 249.39,-149.47 127.74,-85.99 69.66,-56.1"/>
+<polygon fill="black" stroke="black" points="71.44,-53.07 60.95,-51.62 68.24,-59.3 71.44,-53.07"/>
+</g>
+<!-- x1nx2&#45;&gt;nx2 -->
+<g id="edge2" class="edge">
+<title>x1nx2:v0&#45;&gt;nx2</title>
+<path fill="none" stroke="black" d="M324.98,-206.3C324.98,-154.28 354.85,-99.95 375.85,-68.19"/>
+<polygon fill="black" stroke="black" points="378.72,-70.19 381.45,-59.96 372.93,-66.26 378.72,-70.19"/>
+</g>
+<!-- x3x4 -->
+<g id="node12" class="node fragment visible" data-fragment-index="notwin2:!svghighlightgreen">
+<title>x3x4</title>
+<polygon fill="lightgrey" stroke="black" points="680.6,-207.3 680.6,-275.8 727.4,-275.8 727.4,-207.3 680.6,-207.3"/>
+<text xml:space="preserve" text-anchor="middle" x="703.98" y="-250.9" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="680.6,-241.55 727.35,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="703.98" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- x3x4&#45;&gt;x3 -->
+<g id="edge9" class="edge">
+<title>x3x4:v0&#45;&gt;x3</title>
+<path fill="none" stroke="black" d="M679.6,-224.43C648.87,-224.43 663.99,-188.71 645,-164.55 613.64,-124.65 569.66,-85.35 541.75,-61.98"/>
+<polygon fill="black" stroke="black" points="544.05,-59.34 534.11,-55.65 539.58,-64.73 544.05,-59.34"/>
+</g>
+<!-- x3x4&#45;&gt;x4 -->
+<g id="edge10" class="edge">
+<title>x3x4:v0&#45;&gt;x4</title>
+<path fill="none" stroke="black" d="M703.98,-206.3C703.98,-157.46 723.76,-103.73 738.19,-71.02"/>
+<polygon fill="black" stroke="black" points="741.27,-72.71 742.22,-62.16 734.89,-69.81 741.27,-72.71"/>
+</g>
+<!-- nx3nx4 -->
+<g id="node13" class="node fragment visible" data-fragment-index="notwin2:!svghighlight twin2:!svghighlight">
+<title>nx3nx4</title>
+<polygon fill="lightgrey" stroke="black" points="799.6,-207.3 799.6,-275.8 846.4,-275.8 846.4,-207.3 799.6,-207.3"/>
+<text xml:space="preserve" text-anchor="middle" x="822.98" y="-250.9" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="799.6,-241.55 846.35,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="822.98" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- nx3nx4&#45;&gt;nx3 -->
+<g id="edge7" class="edge">
+<title>nx3nx4:v0&#45;&gt;nx3</title>
+<path fill="none" stroke="black" d="M798.6,-224.43C767.64,-224.43 782.24,-188.81 763,-164.55 731.59,-124.95 688.03,-85.56 660.43,-62.1"/>
+<polygon fill="black" stroke="black" points="662.79,-59.51 652.89,-55.75 658.29,-64.86 662.79,-59.51"/>
+</g>
+<!-- nx3nx4&#45;&gt;nx4 -->
+<g id="edge8" class="edge">
+<title>nx3nx4:v0&#45;&gt;nx4</title>
+<path fill="none" stroke="black" d="M822.98,-206.3C822.98,-157.46 842.76,-103.73 857.19,-71.02"/>
+<polygon fill="black" stroke="black" points="860.27,-72.71 861.22,-62.16 853.89,-69.81 860.27,-72.71"/>
+</g>
+<!-- x3neqx4 -->
+<g id="node14" class="node fragment visible" data-fragment-index="notwin1:!svghighlight twin1:!svghighlight">
+<title>x3neqx4</title>
+<polygon fill="lightgrey" stroke="black" points="539.25,-207.3 539.25,-275.8 608.75,-275.8 608.75,-207.3 539.25,-207.3"/>
+<text xml:space="preserve" text-anchor="middle" x="574" y="-250.9" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="539.25,-241.55 608.75,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="556.62" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="574,-207.3 574,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="591.38" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- x3neqx4&#45;&gt;x3 -->
+<g id="edge13" class="edge">
+<title>x3neqx4:v1&#45;&gt;x3</title>
+<path fill="none" stroke="black" d="M591.38,-206.3C591.38,-153.14 558.62,-98.45 536.01,-67.04"/>
+<polygon fill="black" stroke="black" points="539.03,-65.24 530.27,-59.28 533.4,-69.4 539.03,-65.24"/>
+</g>
+<!-- x3neqx4&#45;&gt;nx3 -->
+<g id="edge11" class="edge">
+<title>x3neqx4:v0&#45;&gt;nx3</title>
+<path fill="none" stroke="black" d="M556.62,-206.3C556.62,-153.02 589.81,-98.37 612.72,-67"/>
+<polygon fill="black" stroke="black" points="615.33,-69.35 618.54,-59.25 609.73,-65.14 615.33,-69.35"/>
+</g>
+<!-- x3neqx4&#45;&gt;x4 -->
+<g id="edge12" class="edge">
+<title>x3neqx4:v0&#45;&gt;x4</title>
+<path fill="none" stroke="black" d="M556.62,-206.3C556.62,-163.22 668.31,-90.77 723.22,-57.74"/>
+<polygon fill="black" stroke="black" points="724.99,-60.77 731.79,-52.64 721.41,-54.75 724.99,-60.77"/>
+</g>
+<!-- x3neqx4&#45;&gt;nx4 -->
+<g id="edge14" class="edge">
+<title>x3neqx4:v1&#45;&gt;nx4</title>
+<path fill="none" stroke="black" d="M609.75,-224.43C640.63,-224.43 622.82,-186.04 645,-164.55 660.64,-149.4 782.85,-85.96 841.2,-56.08"/>
+<polygon fill="black" stroke="black" points="842.65,-59.27 849.96,-51.6 839.46,-53.04 842.65,-59.27"/>
+</g>
+<!-- a -->
+<g id="node15" class="node fragment visible" data-fragment-index="notwin1:!svghighlight twin1:!svghighlight">
+<title>a</title>
+<polygon fill="lightgrey" stroke="black" points="439.88,-420.8 439.88,-489.3 544.12,-489.3 544.12,-420.8 439.88,-420.8"/>
+<text xml:space="preserve" text-anchor="middle" x="492" y="-464.4" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="439.88,-455.05 544.12,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="457.25" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="474.62,-420.8 474.62,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="492" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="509.38,-420.8 509.38,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="526.75" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- a&#45;&gt;nx1nx2 -->
+<g id="edge17" class="edge fragment visible" data-fragment-index="twin1:!svghighlight">
+<title>a:v1&#45;&gt;nx1nx2</title>
+<path fill="none" stroke="black" d="M492,-419.8C492,-373.14 476.31,-321.9 462.87,-286.56"/>
+<polygon fill="black" stroke="black" points="466.25,-285.58 459.34,-277.54 459.73,-288.13 466.25,-285.58"/>
+</g>
+<!-- a&#45;&gt;x1x2 -->
+<g id="edge15" class="edge fragment visible" data-fragment-index="notwin1:!svghighlight twin1:!svghighlight">
+<title>a:v0&#45;&gt;x1x2</title>
+<path fill="none" stroke="black" d="M438.88,-437.93C344.84,-437.93 268.88,-343.27 231.4,-285.72"/>
+<polygon fill="black" stroke="black" points="234.43,-283.96 226.1,-277.41 228.52,-287.73 234.43,-283.96"/>
+</g>
+<!-- a&#45;&gt;x1nx2 -->
+<g id="edge19" class="edge fragment visible" data-fragment-index="notwin1:!svghighlight">
+<title>a:v2&#45;&gt;x1nx2</title>
+<path fill="none" stroke="black" d="M526.75,-419.8C526.75,-397.55 414.59,-309.94 357.53,-266.81"/>
+<polygon fill="black" stroke="black" points="359.84,-264.17 349.75,-260.95 355.63,-269.76 359.84,-264.17"/>
+</g>
+<!-- a&#45;&gt;x3neqx4 -->
+<g id="edge16" class="edge fragment visible" data-fragment-index="notwin1:!svghighlight &#160;twin1:!svghighlight">
+<title>a:v0&#45;&gt;x3neqx4</title>
+<path fill="none" stroke="black" d="M457.25,-419.8C457.25,-364.43 497.48,-312.99 530.7,-279.95"/>
+<polygon fill="black" stroke="black" points="533.13,-282.47 537.88,-273 528.26,-277.44 533.13,-282.47"/>
+</g>
+<!-- a&#45;&gt;x3neqx4 -->
+<g id="edge18" class="edge fragment visible" data-fragment-index="twin1:!svghighlight">
+<title>a:v1&#45;&gt;x3neqx4</title>
+<path fill="none" stroke="black" d="M492,-419.8C492,-370.37 518.6,-319.75 541.49,-285.33"/>
+<polygon fill="black" stroke="black" points="544.22,-287.55 546.97,-277.32 538.44,-283.6 544.22,-287.55"/>
+</g>
+<!-- a&#45;&gt;x3neqx4 -->
+<g id="edge20" class="edge fragment visible" data-fragment-index="notwin1:!svghighlight">
+<title>a:v2&#45;&gt;x3neqx4</title>
+<path fill="none" stroke="black" d="M526.75,-419.8C526.75,-373.19 542.19,-321.94 555.42,-286.59"/>
+<polygon fill="black" stroke="black" points="558.57,-288.15 558.89,-277.56 552.04,-285.64 558.57,-288.15"/>
+</g>
+<!-- b -->
+<g id="node16" class="node fragment visible" data-fragment-index="twin2:!svghighlight notwin2:!svghighlight">
+<title>b</title>
+<polygon fill="lightgrey" stroke="black" points="616.5,-420.8 616.5,-489.3 755.5,-489.3 755.5,-420.8 616.5,-420.8"/>
+<text xml:space="preserve" text-anchor="middle" x="686" y="-464.4" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="616.5,-455.05 755.5,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="633.88" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="651.25,-420.8 651.25,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="668.62" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="686,-420.8 686,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="703.38" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="720.75,-420.8 720.75,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="738.12" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- b&#45;&gt;nx1nx2 -->
+<g id="edge27" class="edge fragment visible" data-fragment-index="twin2:!svghighlight">
+<title>b:v2&#45;&gt;nx1nx2</title>
+<path fill="none" stroke="black" d="M738.12,-419.8C738.12,-303.02 612.99,-344.64 513,-284.3 501.32,-277.25 488.53,-269.52 477.17,-262.64"/>
+<polygon fill="black" stroke="black" points="479.29,-259.83 468.92,-257.65 475.66,-265.82 479.29,-259.83"/>
+</g>
+<!-- b&#45;&gt;x1x2 -->
+<g id="edge25" class="edge fragment visible" data-fragment-index="notwin2:!svghighlight twin2:!svghighlight">
+<title>b:v1&#45;&gt;x1x2</title>
+<path fill="none" stroke="black" d="M703.38,-419.8C703.38,-216.3 449.33,-372.64 266,-284.3 256.78,-279.86 247.41,-274.07 238.91,-268.23"/>
+<polygon fill="black" stroke="black" points="241.13,-265.51 230.96,-262.55 237.07,-271.21 241.13,-265.51"/>
+</g>
+<!-- b&#45;&gt;x1nx2 -->
+<g id="edge21" class="edge fragment visible" data-fragment-index="notwin2:!svghighlightgreen">
+<title>b:v0&#45;&gt;x1nx2</title>
+<path fill="none" stroke="black" d="M615.5,-437.93C584.56,-437.93 602.81,-398.95 580,-378.05 509.11,-313.08 468.07,-332.75 385,-284.3 376,-279.05 366.6,-272.87 357.99,-266.9"/>
+<polygon fill="black" stroke="black" points="360.08,-264.1 349.89,-261.19 356.04,-269.82 360.08,-264.1"/>
+</g>
+<!-- b&#45;&gt;x1nx2 -->
+<g id="edge23" class="edge fragment visible" data-fragment-index="notwin2:!svghighlight">
+<title>b:v00&#45;&gt;x1nx2</title>
+<path fill="none" stroke="black" d="M668.62,-419.8C668.62,-280.1 505.76,-354.54 385,-284.3 375.99,-279.06 366.59,-272.89 357.98,-266.92"/>
+<polygon fill="black" stroke="black" points="360.07,-264.11 349.88,-261.2 356.03,-269.83 360.07,-264.11"/>
+</g>
+<!-- b&#45;&gt;x3x4 -->
+<g id="edge22" class="edge fragment visible" data-fragment-index="notwin2:!svghighlightgreen">
+<title>b:v0&#45;&gt;x3x4</title>
+<path fill="none" stroke="black" d="M633.88,-419.8C633.88,-371.61 656.57,-320.89 676.13,-286.11"/>
+<polygon fill="black" stroke="black" points="679.08,-288.01 681.05,-277.61 673.02,-284.51 679.08,-288.01"/>
+</g>
+<!-- b&#45;&gt;nx3nx4 -->
+<g id="edge24" class="edge fragment visible" data-fragment-index="notwin2:!svghighlight">
+<title>b:v00&#45;&gt;nx3nx4</title>
+<path fill="none" stroke="black" d="M668.62,-419.8C668.62,-382.98 745.34,-309.98 790.61,-270.12"/>
+<polygon fill="black" stroke="black" points="792.85,-272.82 798.08,-263.6 788.24,-267.54 792.85,-272.82"/>
+</g>
+<!-- b&#45;&gt;nx3nx4 -->
+<g id="edge26" class="edge fragment visible" data-fragment-index="notwin2:!svghighlight twin2:!svghighlight">
+<title>b:v1&#45;&gt;nx3nx4</title>
+<path fill="none" stroke="black" d="M703.38,-419.8C703.38,-357.17 755.33,-300.11 790.76,-268.48"/>
+<polygon fill="black" stroke="black" points="792.97,-271.19 798.22,-261.99 788.38,-265.91 792.97,-271.19"/>
+</g>
+<!-- b&#45;&gt;nx3nx4 -->
+<g id="edge28" class="edge fragment visible" data-fragment-index="twin2:!svghighlight">
+<title>b:v2&#45;&gt;nx3nx4</title>
+<path fill="none" stroke="black" d="M738.12,-419.8C738.12,-367.87 768.12,-315.04 792.45,-280.73"/>
+<polygon fill="black" stroke="black" points="795.18,-282.93 798.24,-272.79 789.52,-278.81 795.18,-282.93"/>
+</g>
+</g>
+</svg>
+
+</div>
+<div class="row fragment" data-fragment-index="twinmerge">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 13.0.0~dev.20250507.0836 (20250507.0836)
+ -->
+<!-- Title: g Pages: 1 -->
+<svg width="919pt" height="514pt"
+ viewBox="0.00 0.00 919.00 514.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 509.8)">
+<title>g</title>
+<polygon fill="none" stroke="none" points="-4,4 -4,-509.8 915,-509.8 915,4 -4,4"/>
+<g id="clust1" class="cluster">
+<title>cluster_x1</title>
+<polygon fill="#cccccc" stroke="none" points="8,-8 8,-70.8 189,-70.8 189,-8 8,-8"/>
+</g>
+<g id="clust2" class="cluster">
+<title>cluster_x2</title>
+<polygon fill="#cccccc" stroke="none" points="246,-8 246,-70.8 427,-70.8 427,-8 246,-8"/>
+</g>
+<g id="clust3" class="cluster">
+<title>cluster_x3</title>
+<polygon fill="#cccccc" stroke="none" points="484,-8 484,-70.8 665,-70.8 665,-8 484,-8"/>
+</g>
+<g id="clust4" class="cluster">
+<title>cluster_x4</title>
+<polygon fill="#cccccc" stroke="none" points="722,-8 722,-70.8 903,-70.8 903,-8 722,-8"/>
+</g>
+<g id="clust5" class="cluster">
+<title>cluster_t1</title>
+<polygon fill="#cccccc" stroke="none" points="220,-164.55 220,-284.3 424,-284.3 424,-164.55 220,-164.55"/>
+<text xml:space="preserve" text-anchor="middle" x="322" y="-173.9" font-family="Times,serif" font-size="22.00">t₁</text>
+</g>
+<g id="clust6" class="cluster">
+<title>cluster_t2</title>
+<polygon fill="#cccccc" stroke="none" points="480,-164.55 480,-284.3 803,-284.3 803,-164.55 480,-164.55"/>
+<text xml:space="preserve" text-anchor="middle" x="641.5" y="-173.9" font-family="Times,serif" font-size="22.00">t₂</text>
+</g>
+<g id="clust7" class="cluster">
+<title>cluster_t3</title>
+<polygon fill="#cccccc" stroke="none" points="398,-378.05 398,-497.8 660,-497.8 660,-378.05 398,-378.05"/>
+<text xml:space="preserve" text-anchor="middle" x="529" y="-387.4" font-family="Times,serif" font-size="22.00">t₃</text>
+</g>
+<!-- x1 -->
+<g id="node1" class="node">
+<title>x1</title>
+<ellipse fill="lightgrey" stroke="black" cx="158" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="158" y="-31.63" font-family="Times,serif" font-size="22.00">x₁</text>
+</g>
+<!-- nx1 -->
+<g id="node2" class="node">
+<title>nx1</title>
+<ellipse fill="lightgrey" stroke="black" cx="39" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="39" y="-31.63" font-family="Times,serif" font-size="22.00">¬x₁</text>
+</g>
+<!-- x2 -->
+<g id="node3" class="node">
+<title>x2</title>
+<ellipse fill="lightgrey" stroke="black" cx="277" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="277" y="-31.63" font-family="Times,serif" font-size="22.00">x₂</text>
+</g>
+<!-- nx2 -->
+<g id="node4" class="node">
+<title>nx2</title>
+<ellipse fill="lightgrey" stroke="black" cx="396" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="396" y="-31.63" font-family="Times,serif" font-size="22.00">¬x₂</text>
+</g>
+<!-- x3 -->
+<g id="node5" class="node">
+<title>x3</title>
+<ellipse fill="lightgrey" stroke="black" cx="515" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="515" y="-31.63" font-family="Times,serif" font-size="22.00">x₃</text>
+</g>
+<!-- nx3 -->
+<g id="node6" class="node">
+<title>nx3</title>
+<ellipse fill="lightgrey" stroke="black" cx="634" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="634" y="-31.63" font-family="Times,serif" font-size="22.00">¬x₃</text>
+</g>
+<!-- x4 -->
+<g id="node7" class="node">
+<title>x4</title>
+<ellipse fill="lightgrey" stroke="black" cx="753" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="753" y="-31.63" font-family="Times,serif" font-size="22.00">x₄</text>
+</g>
+<!-- nx4 -->
+<g id="node8" class="node">
+<title>nx4</title>
+<ellipse fill="lightgrey" stroke="black" cx="872" cy="-39.4" rx="23.4" ry="23.4"/>
+<text xml:space="preserve" text-anchor="middle" x="872" y="-31.63" font-family="Times,serif" font-size="22.00">¬x₄</text>
+</g>
+<!-- x1eqx2 -->
+<g id="node9" class="node svghighlight">
+<title>x1eqx2</title>
+<polygon fill="lightgrey" stroke="black" points="228.25,-207.3 228.25,-275.8 297.75,-275.8 297.75,-207.3 228.25,-207.3"/>
+<text xml:space="preserve" text-anchor="middle" x="263" y="-250.9" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="228.25,-241.55 297.75,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="245.62" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="263,-207.3 263,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="280.38" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- x1eqx2&#45;&gt;x1 -->
+<g id="edge5" class="edge">
+<title>x1eqx2:v1&#45;&gt;x1</title>
+<path fill="none" stroke="black" d="M280.38,-206.3C280.38,-143.22 222.37,-88.36 186.23,-60.3"/>
+<polygon fill="black" stroke="black" points="188.42,-57.57 178.33,-54.35 184.21,-63.16 188.42,-57.57"/>
+</g>
+<!-- x1eqx2&#45;&gt;nx1 -->
+<g id="edge3" class="edge">
+<title>x1eqx2:v0&#45;&gt;nx1</title>
+<path fill="none" stroke="black" d="M227.25,-224.43C140.66,-224.43 79.14,-123.64 53,-71.24"/>
+<polygon fill="black" stroke="black" points="56.28,-69.98 48.76,-62.51 49.98,-73.04 56.28,-69.98"/>
+</g>
+<!-- x1eqx2&#45;&gt;x2 -->
+<g id="edge6" class="edge">
+<title>x1eqx2:v1&#45;&gt;x2</title>
+<path fill="none" stroke="black" d="M280.38,-206.3C280.38,-160.76 279.09,-108.2 278.1,-74.66"/>
+<polygon fill="black" stroke="black" points="281.6,-74.61 277.8,-64.72 274.61,-74.82 281.6,-74.61"/>
+</g>
+<!-- x1eqx2&#45;&gt;nx2 -->
+<g id="edge4" class="edge">
+<title>x1eqx2:v0&#45;&gt;nx2</title>
+<path fill="none" stroke="black" d="M245.62,-206.3C245.62,-135.76 321.17,-81.87 365.17,-56.47"/>
+<polygon fill="black" stroke="black" points="366.76,-59.59 373.77,-51.65 363.34,-53.48 366.76,-59.59"/>
+</g>
+<!-- x1nx2 -->
+<g id="node10" class="node">
+<title>x1nx2</title>
+<polygon fill="lightgrey" stroke="black" points="369.6,-207.3 369.6,-275.8 416.4,-275.8 416.4,-207.3 369.6,-207.3"/>
+<text xml:space="preserve" text-anchor="middle" x="392.98" y="-250.9" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="369.6,-241.55 416.35,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="392.98" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- x1nx2&#45;&gt;x1 -->
+<g id="edge1" class="edge">
+<title>x1nx2:v0&#45;&gt;x1</title>
+<path fill="none" stroke="black" d="M368.6,-224.43C337.87,-224.43 354.73,-187.24 334,-164.55 290.66,-117.11 226.2,-77.42 188.5,-56.45"/>
+<polygon fill="black" stroke="black" points="190.4,-53.5 179.95,-51.77 187.04,-59.64 190.4,-53.5"/>
+</g>
+<!-- x1nx2&#45;&gt;nx2 -->
+<g id="edge2" class="edge">
+<title>x1nx2:v0&#45;&gt;nx2</title>
+<path fill="none" stroke="black" d="M392.98,-206.3C392.98,-160.76 394.13,-108.2 395.01,-74.66"/>
+<polygon fill="black" stroke="black" points="398.51,-74.81 395.28,-64.72 391.51,-74.62 398.51,-74.81"/>
+</g>
+<!-- x3x4 -->
+<g id="node11" class="node">
+<title>x3x4</title>
+<polygon fill="lightgrey" stroke="black" points="629.6,-207.3 629.6,-275.8 676.4,-275.8 676.4,-207.3 629.6,-207.3"/>
+<text xml:space="preserve" text-anchor="middle" x="652.98" y="-250.9" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="629.6,-241.55 676.35,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="652.98" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- x3x4&#45;&gt;x3 -->
+<g id="edge9" class="edge">
+<title>x3x4:v0&#45;&gt;x3</title>
+<path fill="none" stroke="black" d="M652.98,-206.3C652.98,-139.13 585.29,-84.67 544.73,-58.06"/>
+<polygon fill="black" stroke="black" points="546.66,-55.14 536.34,-52.72 542.9,-61.04 546.66,-55.14"/>
+</g>
+<!-- x3x4&#45;&gt;x4 -->
+<g id="edge10" class="edge">
+<title>x3x4:v0&#45;&gt;x4</title>
+<path fill="none" stroke="black" d="M652.98,-206.3C652.98,-148.2 698.53,-92.96 728.15,-63.19"/>
+<polygon fill="black" stroke="black" points="730.25,-66.03 734.95,-56.54 725.35,-61.03 730.25,-66.03"/>
+</g>
+<!-- nx3nx4 -->
+<g id="node12" class="node">
+<title>nx3nx4</title>
+<polygon fill="lightgrey" stroke="black" points="748.6,-207.3 748.6,-275.8 795.4,-275.8 795.4,-207.3 748.6,-207.3"/>
+<text xml:space="preserve" text-anchor="middle" x="771.98" y="-250.9" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="748.6,-241.55 795.35,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="771.98" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- nx3nx4&#45;&gt;nx3 -->
+<g id="edge7" class="edge">
+<title>nx3nx4:v0&#45;&gt;nx3</title>
+<path fill="none" stroke="black" d="M771.98,-206.3C771.98,-139.13 704.29,-84.67 663.73,-58.06"/>
+<polygon fill="black" stroke="black" points="665.66,-55.14 655.34,-52.72 661.9,-61.04 665.66,-55.14"/>
+</g>
+<!-- nx3nx4&#45;&gt;nx4 -->
+<g id="edge8" class="edge">
+<title>nx3nx4:v0&#45;&gt;nx4</title>
+<path fill="none" stroke="black" d="M771.98,-206.3C771.98,-148.2 817.53,-92.96 847.15,-63.19"/>
+<polygon fill="black" stroke="black" points="849.25,-66.03 853.95,-56.54 844.35,-61.03 849.25,-66.03"/>
+</g>
+<!-- x3neqx4 -->
+<g id="node13" class="node">
+<title>x3neqx4</title>
+<polygon fill="lightgrey" stroke="black" points="488.25,-207.3 488.25,-275.8 557.75,-275.8 557.75,-207.3 488.25,-207.3"/>
+<text xml:space="preserve" text-anchor="middle" x="523" y="-250.9" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="488.25,-241.55 557.75,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="505.62" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="523,-207.3 523,-241.55"/>
+<text xml:space="preserve" text-anchor="middle" x="540.38" y="-216.65" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- x3neqx4&#45;&gt;x3 -->
+<g id="edge13" class="edge">
+<title>x3neqx4:v1&#45;&gt;x3</title>
+<path fill="none" stroke="black" d="M540.38,-206.3C540.38,-159.78 530.5,-106.75 523.07,-73.43"/>
+<polygon fill="black" stroke="black" points="526.55,-72.95 520.91,-63.98 519.73,-74.51 526.55,-72.95"/>
+</g>
+<!-- x3neqx4&#45;&gt;nx3 -->
+<g id="edge11" class="edge">
+<title>x3neqx4:v0&#45;&gt;nx3</title>
+<path fill="none" stroke="black" d="M505.62,-206.3C505.62,-141.5 567.63,-86.64 605.46,-59.2"/>
+<polygon fill="black" stroke="black" points="607.11,-62.32 613.27,-53.7 603.08,-56.6 607.11,-62.32"/>
+</g>
+<!-- x3neqx4&#45;&gt;x4 -->
+<g id="edge12" class="edge">
+<title>x3neqx4:v0&#45;&gt;x4</title>
+<path fill="none" stroke="black" d="M505.62,-206.3C505.62,-154.99 654.28,-83.54 721.12,-54"/>
+<polygon fill="black" stroke="black" points="722.33,-57.29 730.09,-50.08 719.53,-50.88 722.33,-57.29"/>
+</g>
+<!-- x3neqx4&#45;&gt;nx4 -->
+<g id="edge14" class="edge">
+<title>x3neqx4:v1&#45;&gt;nx4</title>
+<path fill="none" stroke="black" d="M558.75,-224.43C589.63,-224.43 570.83,-184.97 594,-164.55 673.12,-94.81 716.47,-115.49 812,-70.8 821.61,-66.31 831.95,-61.17 841.29,-56.42"/>
+<polygon fill="black" stroke="black" points="842.68,-59.64 849.99,-51.97 839.49,-53.42 842.68,-59.64"/>
+</g>
+<!-- a -->
+<g id="node14" class="node">
+<title>a</title>
+<polygon fill="lightgrey" stroke="black" points="406.25,-420.8 406.25,-489.3 475.75,-489.3 475.75,-420.8 406.25,-420.8"/>
+<text xml:space="preserve" text-anchor="middle" x="441" y="-464.4" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="406.25,-455.05 475.75,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="423.62" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="441,-420.8 441,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="458.38" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- a&#45;&gt;x1eqx2 -->
+<g id="edge15" class="edge svghighlight">
+<title>a:v0&#45;&gt;x1eqx2</title>
+<path fill="none" stroke="black" d="M423.62,-419.8C423.62,-350.59 355.56,-296.38 308.05,-266.96"/>
+<polygon fill="black" stroke="black" points="309.92,-264.01 299.55,-261.85 306.31,-270 309.92,-264.01"/>
+</g>
+<!-- a&#45;&gt;x1nx2 -->
+<g id="edge17" class="edge">
+<title>a:v2&#45;&gt;x1nx2</title>
+<path fill="none" stroke="black" d="M458.38,-419.8C458.38,-371.89 437.09,-320.94 418.81,-286.02"/>
+<polygon fill="black" stroke="black" points="422.04,-284.65 414.22,-277.5 415.88,-287.97 422.04,-284.65"/>
+</g>
+<!-- a&#45;&gt;x3neqx4 -->
+<g id="edge16" class="edge">
+<title>a:v0&#45;&gt;x3neqx4</title>
+<path fill="none" stroke="black" d="M423.62,-419.8C423.62,-368.63 455.52,-318.55 483.18,-284.74"/>
+<polygon fill="black" stroke="black" points="485.73,-287.15 489.49,-277.24 480.37,-282.64 485.73,-287.15"/>
+</g>
+<!-- a&#45;&gt;x3neqx4 -->
+<g id="edge18" class="edge">
+<title>a:v2&#45;&gt;x3neqx4</title>
+<path fill="none" stroke="black" d="M458.38,-419.8C458.38,-371.95 479.42,-321 497.49,-286.06"/>
+<polygon fill="black" stroke="black" points="500.42,-288.01 502.02,-277.54 494.23,-284.72 500.42,-288.01"/>
+</g>
+<!-- b -->
+<g id="node15" class="node">
+<title>b</title>
+<polygon fill="lightgrey" stroke="black" points="547.88,-420.8 547.88,-489.3 652.12,-489.3 652.12,-420.8 547.88,-420.8"/>
+<text xml:space="preserve" text-anchor="middle" x="600" y="-464.4" font-family="Times,serif" font-size="22.00">⊎</text>
+<polyline fill="none" stroke="black" points="547.88,-455.05 652.12,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="565.25" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="582.62,-420.8 582.62,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="600" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+<polyline fill="none" stroke="black" points="617.38,-420.8 617.38,-455.05"/>
+<text xml:space="preserve" text-anchor="middle" x="634.75" y="-430.15" font-family="Times,serif" font-size="22.00">×</text>
+</g>
+<!-- b&#45;&gt;x1eqx2 -->
+<g id="edge23" class="edge svghighlight">
+<title>b:v1&#45;&gt;x1eqx2</title>
+<path fill="none" stroke="black" d="M634.75,-419.8C634.75,-273.19 464.21,-351.67 334,-284.3 325.42,-279.86 316.42,-274.86 307.83,-269.9"/>
+<polygon fill="black" stroke="black" points="309.67,-266.92 299.28,-264.89 306.14,-272.96 309.67,-266.92"/>
+</g>
+<!-- b&#45;&gt;x1nx2 -->
+<g id="edge19" class="edge">
+<title>b:v0&#45;&gt;x1nx2</title>
+<path fill="none" stroke="black" d="M565.25,-419.8C565.25,-380.19 475.68,-305.54 425.72,-266.98"/>
+<polygon fill="black" stroke="black" points="427.86,-264.21 417.79,-260.91 423.61,-269.77 427.86,-264.21"/>
+</g>
+<!-- b&#45;&gt;x1nx2 -->
+<g id="edge21" class="edge">
+<title>b:v00&#45;&gt;x1nx2</title>
+<path fill="none" stroke="black" d="M600,-419.8C600,-374.63 484.83,-298.23 426.3,-262.32"/>
+<polygon fill="black" stroke="black" points="428.4,-259.5 418.04,-257.29 424.76,-265.48 428.4,-259.5"/>
+</g>
+<!-- b&#45;&gt;x3x4 -->
+<g id="edge20" class="edge">
+<title>b:v0&#45;&gt;x3x4</title>
+<path fill="none" stroke="black" d="M565.25,-419.8C565.25,-366.91 597.01,-313.51 622.32,-279.35"/>
+<polygon fill="black" stroke="black" points="625.06,-281.52 628.34,-271.44 619.49,-277.28 625.06,-281.52"/>
+</g>
+<!-- b&#45;&gt;nx3nx4 -->
+<g id="edge22" class="edge">
+<title>b:v00&#45;&gt;nx3nx4</title>
+<path fill="none" stroke="black" d="M600,-419.8C600,-380.22 689.44,-305.56 739.33,-266.99"/>
+<polygon fill="black" stroke="black" points="741.44,-269.78 747.24,-260.92 737.18,-264.22 741.44,-269.78"/>
+</g>
+<!-- b&#45;&gt;nx3nx4 -->
+<g id="edge24" class="edge">
+<title>b:v1&#45;&gt;nx3nx4</title>
+<path fill="none" stroke="black" d="M634.75,-419.8C634.75,-351.88 698.53,-294.19 739.13,-264.35"/>
+<polygon fill="black" stroke="black" points="741.08,-267.26 747.17,-258.6 737,-261.57 741.08,-267.26"/>
+</g>
+</g>
+</svg>
+
+</div>
+</div>
+<div class="rstack">
+<div class="fragment current-fragment fade">
+<p>Two nodes
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>1</mn></msub><mo>,</mo><msub><mi>N</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">N_1,N_2</annotation></semantics></math>
+are <strong>twins</strong> if they have the <strong>same
+siblings</strong> for every parent node.</p>
+</div>
+<div class="fragment fade" data-fragment-index="notwin1">
+<p>Same sibling for this parent.</p>
+</div>
+<div class="fragment fade" data-fragment-index="notwin2">
+<p>But not for this one: these two nodes are <strong>not
+twins</strong>.</p>
+</div>
+<div class="fragment fade" data-fragment-index="twin1">
+<p>Same sibling for this parent.</p>
+</div>
+<div class="fragment fade" data-fragment-index="twin2">
+<p>And for this one. They are <strong>twins</strong>!</p>
+</div>
+<div class="fragment fade" data-fragment-index="twinmerge">
+<p>We can merge them 👍. This does not change the computed function.</p>
+</div>
+</div>
+</section>
+<section id="minimization" class="slide level2">
+<h2>Minimization</h2>
+<div class="box">
+<p><strong>Theorem.</strong></p>
+<p>Iteratively merging twins until no twins remain converges to a</p>
+<p><strong>canonical and minimal TDD</strong> computing the same
+function.</p>
+</div>
+<p>In particular: TDDs can be minimized in <strong>polynomial
+time</strong>.</p>
+<div class="box important">
+<p>Next slides: why is the result canonical and minimal?</p>
+</div>
+</section>
+<section id="subfunctions" class="slide level2">
+<h2>Subfunctions</h2>
+<p>Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>f</mi><mo>:</mo><msup><mn>2</mn><mi>X</mi></msup><mo>→</mo><mo stretchy="false" form="prefix">{</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">f : 2^X \rightarrow \{0,1\}</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Y</mi><mo>⊆</mo><mi>X</mi></mrow><annotation encoding="application/x-tex">Y \subseteq X</annotation></semantics></math>.</p>
+<p>Subfunctions of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>f</mi><annotation encoding="application/x-tex">f</annotation></semantics></math>
+on
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Y</mi><annotation encoding="application/x-tex">Y</annotation></semantics></math>:
+Boolean functions obtained by fixing variables in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>X</mi><mo>\</mo><mi>Y</mi></mrow><annotation encoding="application/x-tex">X \setminus Y</annotation></semantics></math>.</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mi>𝗌</mi><mi>𝗎</mi><mi>𝖻</mi><mi>𝖿</mi><mi>𝗎</mi><mi>𝗇</mi><mi>𝖼</mi><mi>𝗍</mi><mi>𝗂</mi><mi>𝗈</mi><mi>𝗇</mi><mi>𝗌</mi></mrow><mo stretchy="false" form="prefix">(</mo><mi>f</mi><mo>,</mo><mi>Y</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mo stretchy="false" form="prefix">{</mo><mi>f</mi><mo stretchy="false" form="prefix">[</mo><mi>τ</mi><mo stretchy="false" form="postfix">]</mo><mo>∣</mo><mi>τ</mi><mo>∈</mo><msup><mn>2</mn><mrow><mi>X</mi><mo>\</mo><mi>Y</mi></mrow></msup><mo>,</mo><mi>f</mi><mo stretchy="false" form="prefix">[</mo><mi>τ</mi><mo stretchy="false" form="postfix">]</mo><mo>≠</mo><mi>⊥</mi><mo stretchy="false" form="postfix">}</mo><mi>.</mi></mrow><annotation encoding="application/x-tex">
+\mathsf{subfunctions}(f,Y) = \{ f[\tau] \mid \tau \in 2^{X \setminus Y}, f[\tau] \neq \bot\}.
+</annotation></semantics></math></p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mspace width="0.167em"></mspace><annotation encoding="application/x-tex">
+\,
+</annotation></semantics></math></p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mspace width="0.167em"></mspace><annotation encoding="application/x-tex">
+\,
+</annotation></semantics></math></p>
+<ul>
+<li>Example –
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>V</mi><mi>E</mi><msub><mi>N</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">EVEN_4</annotation></semantics></math>
+has two subfunctions on
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">{</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">}</mo></mrow><annotation encoding="application/x-tex">\{x_1,x_2\}</annotation></semantics></math>:
+<ul>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>V</mi><mi>E</mi><msub><mi>N</mi><mn>4</mn></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo>,</mo><mn>0</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>E</mi><mi>V</mi><mi>E</mi><msub><mi>N</mi><mn>4</mn></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo>,</mo><mn>1</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>E</mi><mi>V</mi><mi>E</mi><msub><mi>N</mi><mn>2</mn></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">EVEN_4(x_1,x_2,0,0) = EVEN_4(x_1,x_2,1,1) = EVEN_2(x_1,x_2)</annotation></semantics></math></li>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>V</mi><mi>E</mi><msub><mi>N</mi><mn>4</mn></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo>,</mo><mn>1</mn><mo>,</mo><mn>0</mn><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>E</mi><mi>V</mi><mi>E</mi><msub><mi>N</mi><mn>4</mn></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo>,</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>O</mi><mi>D</mi><msub><mi>D</mi><mn>2</mn></msub><mo stretchy="false" form="prefix">(</mo><msub><mi>x</mi><mn>1</mn></msub><mo>,</mo><msub><mi>x</mi><mn>2</mn></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">EVEN_4(x_1,x_2,1,0) = EVEN_4(x_1,x_2,0,1) = ODD_2(x_1,x_2)</annotation></semantics></math></li>
+</ul></li>
+</ul>
+</section>
+<section id="subfunctions-and-canonicity" class="slide level2">
+<h2>Subfunctions and canonicity</h2>
+<div class="row">
+<div class="d">
+<div class="box">
+<p><strong>Lower bound</strong>:</p>
+<p>If
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>τ</mi><mn>1</mn></msub><mo>,</mo><msub><mi>τ</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">\tau_1, \tau_2</annotation></semantics></math>
+are models of the same node
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>,</p>
+<p>then
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>τ</mi><mn>1</mn></msub><annotation encoding="application/x-tex">\tau_1</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>τ</mi><mn>2</mn></msub><annotation encoding="application/x-tex">\tau_2</annotation></semantics></math>
+define the <strong>same subfunction</strong>!</p>
+<p><span class="important">At least
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>#</mi><mrow><mi>𝗌</mi><mi>𝗎</mi><mi>𝖻</mi><mi>𝖿</mi><mi>𝗎</mi><mi>𝗇</mi><mi>𝖼</mi><mi>𝗍</mi><mi>𝗂</mi><mi>𝗈</mi><mi>𝗇</mi><mi>𝗌</mi></mrow><mo stretchy="false" form="prefix">(</mo><mi>f</mi><mo>,</mo><msub><mi>X</mi><mi>t</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\#\mathsf{subfunctions}(f,X_t)</annotation></semantics></math>
+nodes in bag
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
+for each
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math></span></p>
+</div>
+<div class="box fragment">
+<p><strong>Upper bound</strong>:</p>
+<p>If one bag
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>t</mi><annotation encoding="application/x-tex">t</annotation></semantics></math>
+has size
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&gt;</mo><mi>#</mi><mrow><mi>𝗌</mi><mi>𝗎</mi><mi>𝖻</mi><mi>𝖿</mi><mi>𝗎</mi><mi>𝗇</mi><mi>𝖼</mi><mi>𝗍</mi><mi>𝗂</mi><mi>𝗈</mi><mi>𝗇</mi><mi>𝗌</mi></mrow><mo stretchy="false" form="prefix">(</mo><mi>f</mi><mo>,</mo><msub><mi>X</mi><mi>t</mi></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">&gt; \#\mathsf{subfunctions}(f,X_t)</annotation></semantics></math>,</p>
+<p>the TDD must contain one pair of twins.</p>
+</div>
+<div class="box fragment">
+<p><span class="important">Iteratively contracting twins converges to a
+canonical minimal TDD!</span></p>
+</div>
+</div>
+<div class="d">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+ "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Generated by graphviz version 13.0.0~dev.20250507.0836 (20250507.0836)
+ -->
+<!-- Title: g Pages: 1 -->
+<svg width="350pt" height="359pt"
+ viewBox="0.00 0.00 350.00 359.00" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 355.25)">
+<title>g</title>
+<polygon fill="none" stroke="none" points="-4,4 -4,-355.25 346,-355.25 346,4 -4,4"/>
+<g id="clust1" class="cluster">
+<title>cluster_t</title>
+<polygon fill="none" stroke="black" points="64,-142.5 64,-235.25 278,-235.25 278,-142.5 64,-142.5"/>
+<text xml:space="preserve" text-anchor="middle" x="171" y="-217.95" font-family="Times,serif" font-size="14.00">t</text>
+</g>
+<!-- r -->
+<g id="node1" class="node">
+<title>r</title>
+<text xml:space="preserve" text-anchor="middle" x="171" y="-328.57" font-family="Times,serif" font-size="14.00">r</text>
+</g>
+<!-- dots1 -->
+<g id="node2" class="node">
+<title>dots1</title>
+<text xml:space="preserve" text-anchor="middle" x="171" y="-256.57" font-family="Times,serif" font-size="14.00">...</text>
+</g>
+<!-- r&#45;&gt;dots1 -->
+<!-- c -->
+<!-- r&#45;&gt;c -->
+<g id="edge11" class="edge">
+<title>r&#45;&gt;c</title>
+<path fill="none" stroke="black" d="M144.21,-316.69C118.17,-300.05 79.74,-271.12 60,-235.25 24.09,-170.01 24.07,-77.49 25.84,-39.52"/>
+</g>
+<!-- d -->
+<!-- r&#45;&gt;d -->
+<g id="edge12" class="edge">
+<title>r&#45;&gt;d</title>
+<path fill="none" stroke="black" d="M197.79,-316.69C223.83,-300.05 262.26,-271.12 282,-235.25 317.91,-170.01 317.93,-77.49 316.16,-39.52"/>
+</g>
+<!-- t -->
+<g id="node4" class="node">
+<title>t</title>
+<polygon fill="none" stroke="black" points="144,-151 144,-201.5 198,-201.5 198,-151 144,-151"/>
+<text xml:space="preserve" text-anchor="middle" x="171" y="-184.2" font-family="Times,serif" font-size="14.00">N</text>
+<polyline fill="none" stroke="black" points="144,-176.25 198,-176.25"/>
+<text xml:space="preserve" text-anchor="middle" x="157.25" y="-158.95" font-family="Times,serif" font-size="14.00"> </text>
+<polyline fill="none" stroke="black" points="170.5,-151 170.5,-176.25"/>
+<text xml:space="preserve" text-anchor="middle" x="184.25" y="-158.95" font-family="Times,serif" font-size="14.00"> </text>
+</g>
+<!-- dots1&#45;&gt;t -->
+<!-- n1 -->
+<g id="node3" class="node">
+<title>n1</title>
+<polygon fill="none" stroke="black" points="72,-158.25 72,-194.25 126,-194.25 126,-158.25 72,-158.25"/>
+<text xml:space="preserve" text-anchor="middle" x="85.25" y="-171.57" font-family="Times,serif" font-size="14.00"> </text>
+<polyline fill="none" stroke="black" points="98.5,-158.25 98.5,-194.25"/>
+<text xml:space="preserve" text-anchor="middle" x="112.25" y="-171.57" font-family="Times,serif" font-size="14.00"> </text>
+</g>
+<!-- dots -->
+<g id="node7" class="node">
+<title>dots</title>
+<text xml:space="preserve" text-anchor="middle" x="171" y="-91.83" font-family="Times,serif" font-size="14.00">...</text>
+</g>
+<!-- t&#45;&gt;dots -->
+<!-- a -->
+<!-- t&#45;&gt;a -->
+<g id="edge9" class="edge">
+<title>t&#45;&gt;a</title>
+<path fill="none" stroke="black" d="M155.17,-150.63C148.52,-139.78 140.96,-126.73 135,-114.5 122.57,-89 111.21,-58.05 104.7,-39.27"/>
+</g>
+<!-- b -->
+<!-- t&#45;&gt;b -->
+<g id="edge10" class="edge">
+<title>t&#45;&gt;b</title>
+<path fill="none" stroke="black" d="M186.83,-150.63C193.48,-139.78 201.04,-126.73 207,-114.5 219.43,-89 230.79,-58.05 237.3,-39.27"/>
+</g>
+<!-- n2 -->
+<g id="node5" class="node">
+<title>n2</title>
+<polygon fill="none" stroke="black" points="216,-158.25 216,-194.25 270,-194.25 270,-158.25 216,-158.25"/>
+<text xml:space="preserve" text-anchor="middle" x="229.25" y="-171.57" font-family="Times,serif" font-size="14.00"> </text>
+<polyline fill="none" stroke="black" points="242.5,-158.25 242.5,-194.25"/>
+<text xml:space="preserve" text-anchor="middle" x="256.25" y="-171.57" font-family="Times,serif" font-size="14.00"> </text>
+</g>
+<!-- Xt -->
+<g id="node6" class="node">
+<title>Xt</title>
+<text xml:space="preserve" text-anchor="middle" x="171" y="-25.2" font-family="Times,serif" font-size="14.00">τ₁,τ₂</text>
+<text xml:space="preserve" text-anchor="middle" x="171" y="-7.95" font-family="Times,serif" font-size="14.00">Xₜ</text>
+</g>
+<!-- Xt&#45;&gt;b -->
+<!-- dots&#45;&gt;Xt -->
+<!-- a&#45;&gt;Xt -->
+<!-- b&#45;&gt;d -->
+<!-- c&#45;&gt;a -->
+</g>
+</svg>
+
+</div>
+</div>
+</section>
+<section id="bottom-up-compilation" class="slide level2">
+<h2>Bottom-up compilation</h2>
+<div class="split">
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> cnf2tdd(F: cnf, T: vtree):</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    D <span class="op">=</span> TDD(<span class="dv">1</span>, T)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> c <span class="kw">in</span> F:</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>        Dc <span class="op">=</span> TDD(c, T)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>        D.conjoin(Dc)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>        D.minimize()</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> D</span></code></pre></div>
+<div class="fragment">
+<p>For a CNF
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mo>=</mo><msub><mi>C</mi><mn>1</mn></msub><mo>∧</mo><mi>…</mi><mo>∧</mo><msub><mi>C</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">F = C_1 \wedge \dots \wedge C_m</annotation></semantics></math>
+with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>n</mi><annotation encoding="application/x-tex">n</annotation></semantics></math>
+variables:</p>
+<ul>
+<li>Let
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>W</mi><mi>i</mi></msub><mo>=</mo></mrow><annotation encoding="application/x-tex">W_i =</annotation></semantics></math>
+width of the TDD obtained after conjoining
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>i</mi></msub><annotation encoding="application/x-tex">C_i</annotation></semantics></math>.</li>
+<li>Runs in time
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>n</mi><mi>m</mi><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mrow><mi mathvariant="normal">max</mi><mo>&#8289;</mo></mrow><msub><mi>W</mi><mi>i</mi></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(nm \cdot (\max W_i))</annotation></semantics></math></li>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><msup><mn>2</mn><mi>k</mi></msup><mo>⋅</mo><mi>n</mi><mi>m</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(2^k \cdot nm)</annotation></semantics></math>
+for CNF of incidence tw
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>k</mi><annotation encoding="application/x-tex">k</annotation></semantics></math>
+(for a well chosen vtree
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>).</li>
+<li>Complexity follows by just analysing the number of
+subfunctions!</li>
+</ul>
+</div>
+</div>
+<div class="box fragment">
+<p>Implemented by Guy Van Den Broeck:<br> <strong>TiDiDi</strong>
+compiler shows promising results.</p>
+</div>
+</section>
+<section id="learning-tdd" class="slide level2">
+<h2>Learning TDD</h2>
+<p>Angluin-style learning algorithm.</p>
+<p><strong>Build the canonical TDD</strong> of size
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
+of a Boolean function with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mo stretchy="false" form="prefix">(</mo><mi>S</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">O(S)</annotation></semantics></math>
+equivalence queries to the oracle.</p>
+</section>
+<section id="existential-and-universal-projection" class="slide level2">
+<h2>Existential and Universal Projection</h2>
+<p>Given a TDD
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>
+of width
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>w</mi><annotation encoding="application/x-tex">w</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Y</mi><mo>⊆</mo><mi>X</mi></mrow><annotation encoding="application/x-tex">Y \subseteq X</annotation></semantics></math>.</p>
+<p>We can construct a TDD computing
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∃</mo><mi>Y</mi><mi>.</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">\exists Y. C</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∀</mo><mi>Y</mi><mi>.</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">\forall Y. C</annotation></semantics></math>
+of width at most
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mn>2</mn><mi>w</mi></msup><annotation encoding="application/x-tex">2^w</annotation></semantics></math>!</p>
+<p><strong>Applications to QBF solving on bounded treewidth
+instances!</strong></p>
+</section>
+<section id="future-work" class="slide level2">
+<h2>Future work</h2>
+<ul>
+<li>Open questions on lower bounds:
+<ol type="1">
+<li><em>TDD vs Canonical SDD</em>: are they comparable?
+<ul>
+<li>Canonical SDD
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≮</mo><annotation encoding="application/x-tex">\not &lt;</annotation></semantics></math>
+TDD is known.</li>
+<li>Do we have (TDD
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>&lt;</mo><annotation encoding="application/x-tex">&lt;</annotation></semantics></math>
+Canonical SDD) or (TDD
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>≮</mo><annotation encoding="application/x-tex">\not &lt;</annotation></semantics></math>
+Canonical SDD)?</li>
+</ul></li>
+<li><em>TDD vs OBDD</em>
+<ul>
+<li>Currently known separation is <strong>quasipolynomial</strong>.</li>
+<li>Do we have <em>quasipolynomial simulation</em>? <em>Exponential
+separation</em>?</li>
+</ul></li>
+</ol></li>
+<li>Work in progress: <strong>Certified TDD</strong> using the CPOG
+framework.</li>
+</ul>
+</section>
+<section id="take-away" class="slide level2">
+<h2>Take away</h2>
+<ul>
+<li>TDDs are <em>more compact</em> than OBDDs and have the <em>same
+tractability guarantees</em>.</li>
+<li>Promising in practice: <strong>TiDiDi</strong> has entered the model
+counting competition, let’s see the results.</li>
+<li>See the paper for an extensive study of TDDs.</li>
+</ul>
+<div class="box fragment">
+<p>muito obrigado :)</p>
+</div>
+</section></section>
+</body>
+</html>
